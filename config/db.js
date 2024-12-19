@@ -5,7 +5,7 @@ const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
   password: '',
-  database: 'testing_tubes',
+  database: 'studyitfinal',
 });
 
 // Koneksi ke database
