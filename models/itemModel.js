@@ -1,48 +1,58 @@
 const db = require('../config/db');
 
 // Mendapatkan semua item
-const getAllItems = (callback) => {
+const getAllItems = async () => {
   const sql = 'SELECT * FROM items';
-  db.query(sql, (err, results) => {
-    if (err) return callback(err);
-    callback(null, results);
-  });
+  try {
+    const [results] = await db.query(sql);
+    return results;
+  } catch (err) {
+    throw err;
+  }
 };
 
 // Menambahkan item baru
-const createItem = (data, callback) => {
+const createItem = async (data) => {
   const sql = 'INSERT INTO items SET ?';
-  db.query(sql, data, (err, result) => {
-    if (err) return callback(err);
-    callback(null, result);
-  });
+  try {
+    const [result] = await db.query(sql, data);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 };
 
 // Mendapatkan item berdasarkan ID
-const getItemById = (id, callback) => {
+const getItemById = async (id) => {
   const sql = 'SELECT * FROM items WHERE id = ?';
-  db.query(sql, [id], (err, results) => {
-    if (err) return callback(err);
-    callback(null, results[0]);
-  });
+  try {
+    const [results] = await db.query(sql, [id]);
+    return results[0]; // Mengembalikan hanya satu item
+  } catch (err) {
+    throw err;
+  }
 };
 
 // Mengupdate item
-const updateItem = (id, data, callback) => {
+const updateItem = async (id, data) => {
   const sql = 'UPDATE items SET ? WHERE id = ?';
-  db.query(sql, [data, id], (err, result) => {
-    if (err) return callback(err);
-    callback(null, result);
-  });
+  try {
+    const [result] = await db.query(sql, [data, id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 };
 
 // Menghapus item
-const deleteItem = (id, callback) => {
+const deleteItem = async (id) => {
   const sql = 'DELETE FROM items WHERE id = ?';
-  db.query(sql, [id], (err, result) => {
-    if (err) return callback(err);
-    callback(null, result);
-  });
+  try {
+    const [result] = await db.query(sql, [id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
 };
 
 module.exports = { getAllItems, createItem, getItemById, updateItem, deleteItem };

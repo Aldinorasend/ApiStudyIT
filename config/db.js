@@ -1,20 +1,26 @@
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
-// Konfigurasi koneksi database
-const db = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
-  database: 'testing_tubes',
+// Konfigurasi koneksi database menggunakan pool
+const pool = mysql.createPool({
+  host: '153.92.15.44',
+  user: 'u229098060_studyittubes',
+  password: 'TubesSmt5',
+  database: 'u229098060_studyitfinal',
+  waitForConnections: true,
+  connectionLimit: 10, // Maksimum koneksi simultan
+  queueLimit: 0,       // Tidak ada batas antrian
 });
 
-// Koneksi ke database
-db.connect((err) => {
-  if (err) {
+// Fungsi untuk memeriksa koneksi
+(async () => {
+  try {
+    const connection = await pool.getConnection(); // Ambil koneksi dari pool
+    console.log('Connected to the database.');
+    connection.release(); // Kembalikan koneksi ke pool
+  } catch (err) {
     console.error('Error connecting to database:', err.message);
-    return;
   }
-  console.log('Connected to the database.');
-});
+})();
 
-module.exports = db;
+// Ekspor pool untuk digunakan di file lain
+module.exports = pool;
