@@ -15,7 +15,7 @@ app.use(bodyParser.json());
 
 // Gunakan routes untuk API
 app.use('/api', itemRoutes); // Semua API diawali dengan /api
-app.use('/api', accountRoutes);
+// app.use('/api', accountRoutes);
 
 // Jalankan server
 app.listen(3000, () => console.log('Server running on http://localhost:3000'));
