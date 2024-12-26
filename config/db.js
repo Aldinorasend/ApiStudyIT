@@ -7,9 +7,10 @@ const pool = mysql.createPool({
   password: 'TubesSmt5',
   database: 'u229098060_studyitfinal',
   waitForConnections: true,
-  connectionLimit: 10, // Maksimum koneksi simultan
-  queueLimit: 0,       // Tidak ada batas antrian
+  connectionLimit: 10,
+  queueLimit: 0,
 });
+
 
 // Fungsi untuk memeriksa koneksi
 (async () => {
