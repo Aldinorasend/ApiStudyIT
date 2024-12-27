@@ -5,7 +5,11 @@ const cors = require('cors'); // Import cors
 const itemRoutes = require('./routes/itemRoutes');
 const accountRoutes = require('./routes/accountRoutes');
 const instructorRoutes = require('./routes/instructorRoutes');
+
+require('dotenv').config();
+
 const courseRoutes = require('./routes/courseRoutes');
+
 
 const app = express();
 
