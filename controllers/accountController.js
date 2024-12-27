@@ -22,6 +22,7 @@ const AccountController = {
         phonenumber,
         email,
         password: hashedPassword,
+        regist_date: new Date(),
       };
 
       const result = await createAccount(data);
@@ -67,9 +68,14 @@ const AccountController = {
       };
 
       const JWT_SECRET = process.env.JWT_SECRET;
-      const token = jwt.sign(tokenPayload, JWT_SECRET, {
-        expiresIn: rememberMe ? '7d' : '1h',
-      });
+
+if (!JWT_SECRET) {
+  throw new Error('JWT_SECRET is not set in environment variables');
+}
+
+const token = jwt.sign(tokenPayload, JWT_SECRET, {
+  expiresIn: rememberMe ? '7d' : '1h',
+});
 
       // Update remember_token if rememberMe is true
       if (rememberMe) {

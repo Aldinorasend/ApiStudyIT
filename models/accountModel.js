@@ -1,7 +1,7 @@
 const db = require('../config/db');
 
 const createAccount = async (data) => {
-  const sql = `INSERT INTO accounts (username, firstname, lastname, phonenumber, email, password) VALUES (?, ?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO accounts (username, firstname, lastname, phonenumber, email, password, regist_date) VALUES (?, ?, ?, ?, ?, ?, ?)`;
   try {
     // Cek apakah email atau username sudah ada
     const existingEmail = await getAccountByEmailorUsername(data.email);
@@ -17,6 +17,7 @@ const createAccount = async (data) => {
       data.phonenumber,
       data.email,
       data.password,
+      data.regist_date
     ]);
     return result;
   } catch (err) {
