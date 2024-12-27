@@ -6,6 +6,6 @@ const AccountController = require('../controllers/accountController');
 router.post('/register', AccountController.createAccount);
 
 // Route untuk mendapatkan akun berdasarkan email atau username
-router.get('/login', AccountController.getAccount);
+router.post('/login', AccountController.getAccount);
 
 module.exports = router;

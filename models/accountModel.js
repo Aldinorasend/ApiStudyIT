@@ -1,12 +1,13 @@
 const db = require('../config/db');
 
 const createAccount = async (data) => {
-  const sql = `INSERT INTO accounts (username, firstname, lastname, phonenumber, email, password, regist_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+  const sql = `INSERT INTO accounts (username, firstname, lastname, phonenumber, email, password) VALUES (?, ?, ?, ?, ?, ?)`;
   try {
     // Cek apakah email atau username sudah ada
-    const existingAccount = await getAccountByEmailorUsername(data.email);
-    if (existingAccount) {
-      throw new Error('Email or username already in use.');
+    const existingEmail = await getAccountByEmailorUsername(data.email);
+
+    if (existingEmail) {
+      throw new Error('Email already in use.');
     }
 
     const [result] = await db.query(sql, [
@@ -16,7 +17,6 @@ const createAccount = async (data) => {
       data.phonenumber,
       data.email,
       data.password,
-      data.regist_date,
     ]);
     return result;
   } catch (err) {
@@ -40,31 +40,3 @@ module.exports = {
   createAccount,
   getAccountByEmailorUsername,
 };
-
-
-
-// const Account = {
-//   create: (email, password, callback) => {
-//     const query = 'INSERT INTO accounts (email, password) VALUES (?, ?)';
-//     db.query(query, [email, password], (err, results) => {
-//       if (err) {
-//         return callback(err, null);
-//       }
-//       callback(null, results);
-//     });
-//   },
-
-//   findByEmail: (email, callback) => {
-//     const query = 'SELECT * FROM accounts WHERE email = ? LIMIT 1';
-//     db.query(query, [email], (err, results) => {
-//       if (err) {
-//         return callback(err, null);
-//       }
-//       if (results.length > 0) {
-//         callback(null, results[0]);
-//       } else {
-//         callback(null, null);
-//       }
-//     });
-//   },
-// };
