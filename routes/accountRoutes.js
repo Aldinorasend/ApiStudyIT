@@ -1,10 +1,11 @@
 const express = require('express');
-const { addAccount, login } = require('../controllers/accountController');
-
 const router = express.Router();
+const AccountController = require('../controllers/accountController');
 
-// Route untuk menambah akun
-router.post('/register', addAccount);
-router.post('/login', login)
+// Route untuk membuat akun baru
+router.post('/register', AccountController.createAccount);
+
+// Route untuk mendapatkan akun berdasarkan email atau username
+router.post('/login', AccountController.getAccount);
 
 module.exports = router;
