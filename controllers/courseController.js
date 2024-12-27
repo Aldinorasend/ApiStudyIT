@@ -4,6 +4,7 @@ const {
     getCourseById,
     updateCourse,
     deleteCourse,
+    getPhotoPathById
   } = require('../models/courseModel');
   
   // Mendapatkan semua course
@@ -121,16 +122,41 @@ const addCourse = async (req, res) => {
     }
   };
   
-  // Menghapus course
-  const removeCourse = async (req, res) => {
-    const id = req.params.id;
-    try {
-      await deleteCourse(id);
-      res.json({ message: 'Course deleted' });
-    } catch (err) {
-      res.status(500).json({ error: 'Error deleting course', details: err.message });
-    }
-  };
+
   
-  module.exports = { getCourses, addCourse, getCourse, editCourse, removeCourse };
+  const fst = require('fs').promises;
+
+const removeCourse = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    // Dapatkan path foto dari database
+    const photoPath = await getPhotoPathById(id); // Pastikan fungsi ini sudah ada
+    if (!photoPath) {
+      return res.status(404).json({ error: 'Course not found or no photo associated' });
+    }
+
+    // Hapus file foto dari folder uploads
+    const filePath = path.resolve(__dirname, '../uploads', photoPath); // Path absolut
+    try {
+      // Pastikan fs.unlink tidak menggunakan callback
+      await fst.unlink(filePath);
+      console.log(`File deleted: ${filePath}`);
+    } catch (fileErr) {
+      console.warn(`Failed to delete file: ${filePath}. Error: ${fileErr.message}`);
+    }
+
+    // Hapus course dari database
+    await deleteCourse(id); // Pastikan fungsi ini sudah ada
+
+    res.json({ message: 'Course and associated photo deleted' });
+  } catch (err) {
+    console.error('Error deleting course or file:', err.message);
+    res.status(500).json({ error: 'Error deleting course', details: err.message });
+  }
+};
+
+  
+  
+  module.exports = { getCourses, addCourse, getCourse, editCourse, removeCourse, getPhotoPathById };
   
