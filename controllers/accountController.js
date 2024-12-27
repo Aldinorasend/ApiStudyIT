@@ -1,3 +1,4 @@
+const db = require('../config/db');
 const bcrypt = require('bcrypt');
 const { createAccount, getAccountByEmailorUsername } = require('../models/accountModel');
 const jwt = require('jsonwebtoken');
@@ -21,7 +22,6 @@ const AccountController = {
         phonenumber,
         email,
         password: hashedPassword,
-        regist_date: new Date(),
       };
 
       const result = await createAccount(data);
@@ -66,15 +66,18 @@ const AccountController = {
         email: account.email,
       };
 
-      const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+      const JWT_SECRET = process.env.JWT_SECRET;
+      const token = jwt.sign(tokenPayload, JWT_SECRET, {
         expiresIn: rememberMe ? '7d' : '1h',
       });
 
       // Update remember_token if rememberMe is true
       if (rememberMe) {
         account.remember_token = token;
-        // Add logic to update remember_token in the database if needed
+        const updateSql = 'UPDATE accounts SET remember_token = ? WHERE id = ?';
+        await db.query(updateSql, [token, account.id]);
       }
+      
 
       res.json({
         message: 'Login successful.',
