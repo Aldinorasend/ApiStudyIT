@@ -1,11 +1,18 @@
 const express = require('express');
+const {
+    getAccounts, 
+    addAccount, 
+    getAccount, 
+    editAccount,
+    removeAccount
+} = require('../controllers/accountController');
+
 const router = express.Router();
-const AccountController = require('../controllers/accountController');
 
-// Route untuk membuat akun baru
-router.post('/register', AccountController.createAccount);
-
-// Route untuk mendapatkan akun berdasarkan email atau username
-router.post('/login', AccountController.getAccount);
+router.get('/Accounts', getAccounts);
+router.post('/Accounts', addAccount);
+router.post('/Accounts/:id', getAccount);
+router.put('/Accounts/:id', editAccount);
+router.delete('/Accounts/:id', removeAccount);
 
 module.exports = router;
