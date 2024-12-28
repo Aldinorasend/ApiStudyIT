@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.get('/Accounts', getAccounts);
 router.post('/Accounts', addAccount);
-router.post('/Accounts/:id', getAccount);
+router.post('/Accounts/search', getAccount);
 router.put('/Accounts/:id', editAccount);
 router.delete('/Accounts/:id', removeAccount);
 
