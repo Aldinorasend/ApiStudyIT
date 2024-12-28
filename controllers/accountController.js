@@ -20,6 +20,8 @@ const addAccount = async (req, res) => {
     const hashedPassword = await bcrypt.hash(data.password, 10);  // 10 adalah salt rounds
     data.password = hashedPassword;
 
+    data.regist_date = new Date();
+
     const result = await createAccount(data);
     res.json({ message: 'Account Created', id: result.insertId });
   } catch (err) {
