@@ -6,6 +6,7 @@ const itemRoutes = require('./routes/itemRoutes');
 const accountRoutes = require('./routes/accountRoutes');
 const instructorRoutes = require('./routes/instructorRoutes');
 const modulRoutes = require('./routes/modulRoutes');
+const enrollRoutes = require('./routes/enrollRoutes');
 
 require('dotenv').config();
 
@@ -27,6 +28,7 @@ app.use('/api', accountRoutes);
 app.use('/api', instructorRoutes)
 
 app.use('/api', modulRoutes);
+app.use('/api', enrollRoutes);
 
 app.use('/api', courseRoutes)
 
