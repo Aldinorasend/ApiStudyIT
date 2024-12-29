@@ -6,6 +6,22 @@ const getAllCourses = async () => {
     SELECT courses.*, instructors.firstname, instructors.lastname 
     FROM courses
     LEFT JOIN instructors ON courses.instructor_id = instructors.id
+    ORDER BY courses.level ASC
+  `;
+  try {
+    const [results] = await db.query(sql);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const getFreeCourses = async () => {
+  const sql = `
+    SELECT courses.*, instructors.firstname, instructors.lastname 
+    FROM courses
+    LEFT JOIN instructors ON courses.instructor_id = instructors.id
+    WHERE courses.level = 'beginner'
   `;
   try {
     const [results] = await db.query(sql);
@@ -33,7 +49,7 @@ const getCourseById = async (id) => {
     SELECT courses.*, instructors.firstname, instructors.lastname 
     FROM courses
     LEFT JOIN instructors ON courses.instructor_id = instructors.id
-    WHERE courses.id = ?
+    WHERE courses.id = ? 
   `;
   try {
     const [results] = await db.query(sql, [id]);
@@ -74,4 +90,4 @@ const getPhotoPathById = async (id) => {
     throw err;
   }
 };
-module.exports = { getAllCourses, createCourse, getCourseById, updateCourse, deleteCourse, getPhotoPathById };
+module.exports = { getAllCourses, getFreeCourses, createCourse, getCourseById, updateCourse, deleteCourse, getPhotoPathById };
