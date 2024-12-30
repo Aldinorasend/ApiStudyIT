@@ -7,6 +7,8 @@ const accountRoutes = require('./routes/accountRoutes');
 const instructorRoutes = require('./routes/instructorRoutes');
 const modulRoutes = require('./routes/modulRoutes');
 const enrollRoutes = require('./routes/enrollRoutes');
+const taskRoutes = require('./routes/taskRoutes'); // Import task routes
+
 
 require('dotenv').config();
 
@@ -30,7 +32,10 @@ app.use('/api', instructorRoutes)
 app.use('/api', modulRoutes);
 app.use('/api', enrollRoutes);
 
-app.use('/api', courseRoutes)
+app.use('/api', courseRoutes);
+
+
+app.use('/api', taskRoutes);
 
 
 // Jalankan server
