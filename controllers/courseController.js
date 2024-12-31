@@ -1,6 +1,7 @@
 const {
     getAllCourses,
     createCourse,
+    getFreeCourses,
     getCourseById,
     updateCourse,
     deleteCourse,
@@ -16,7 +17,14 @@ const {
       res.status(500).json({ error: 'Error fetching courses', details: err.message });
     }
   };
-  
+  const getFreeCoursesForFreeUser = async (req, res) => {
+    try {
+      const courses = await getFreeCourses(); // Menggunakan async/await
+      res.json(courses);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching courses', details: err.message });
+    }
+  };
   // Menambahkan course baru
   const multer = require('multer');
 const fs = require('fs');
@@ -96,7 +104,6 @@ const addCourse = async (req, res) => {
 
 
 
-// Fungsi untuk transfer file ke server Laravel
 
   // Mendapatkan course berdasarkan ID
   const getCourse = async (req, res) => {
@@ -158,5 +165,5 @@ const removeCourse = async (req, res) => {
 
   
   
-  module.exports = { getCourses, addCourse, getCourse, editCourse, removeCourse, getPhotoPathById };
+  module.exports = { getCourses, getFreeCoursesForFreeUser,addCourse, getCourse, editCourse, removeCourse, getPhotoPathById };
   

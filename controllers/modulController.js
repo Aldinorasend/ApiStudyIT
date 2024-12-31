@@ -4,6 +4,7 @@ const {
     getModulById,
     updateModul,
     deleteModul,
+    getModulByIdCourse
   } = require('../models/modulModel');
   
   // Mendapatkan semua modul
@@ -13,6 +14,16 @@ const {
       res.json(moduls);
     } catch (err) {
       res.status(500).json({ error: 'Error fetching moduls', details: err.message });
+    }
+  };
+
+  const getModulsByCourseID = async (req, res) => {
+    const CourseID = req.params.CourseID;
+    try {
+      const moduls = await getModulByIdCourse(CourseID); // Menggunakan async/await
+      res.json(moduls);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching moduls by Course ID', details: err.message });
     }
   };
   
@@ -62,5 +73,5 @@ const {
     }
   };
   
-  module.exports = { getModuls, addModul, getModul, editModul, removeModul };
+  module.exports = { getModuls, addModul, getModul, editModul, removeModul, getModulsByCourseID };
   

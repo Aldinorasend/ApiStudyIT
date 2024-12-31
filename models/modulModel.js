@@ -33,6 +33,16 @@ const getModulById = async (id) => {
   }
 };
 
+const getModulByIdCourse = async (CourseID) => {
+  const sql = 'SELECT * FROM moduls WHERE CourseID = ?';
+  try {
+    const [results] = await db.query(sql, [CourseID]);
+    return results[0]; // Mengembalikan hanya satu modul
+  } catch (err) {
+    throw err;
+  }
+};
+
 // Mengupdate modul
 const updateModul = async (id, data) => {
   const sql = 'UPDATE moduls SET ? WHERE id = ?';
@@ -55,4 +65,4 @@ const deleteModul = async (id) => {
   }
 };
 
-module.exports = { getAllModuls, createModul, getModulById, updateModul, deleteModul };
+module.exports = { getAllModuls, createModul, getModulById,getModulByIdCourse, updateModul, deleteModul };
