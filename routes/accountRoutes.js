@@ -4,7 +4,9 @@ const {
     addAccount, 
     getAccount, 
     editAccount,
-    removeAccount
+    removeAccount,
+    requestResetPassword,
+    resetPassword
 } = require('../controllers/accountController');
 
 const router = express.Router();
@@ -14,5 +16,7 @@ router.post('/Accounts', addAccount);
 router.post('/Accounts/search', getAccount);
 router.put('/Accounts/:id', editAccount);
 router.delete('/Accounts/:id', removeAccount);
+router.post('/Accounts/request-reset', requestResetPassword);
+router.post('/Accounts/reset-password/:token', resetPassword);
 
 module.exports = router;

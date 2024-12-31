@@ -1,7 +1,8 @@
 const bcrypt = require('bcrypt');
-
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const {
-  getAllAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount
+  getAllAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken
 } = require('../models/accountModel');
 
 const getAccounts = async (req, res) => {
@@ -76,105 +77,73 @@ const removeAccount = async (req, res) => {
   }
 };
 
+// Konfigurasi Nodemailer
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: 'haritsazfa@gmail.com',
+    pass: 'bpyz ojiv sfew xcjo',
+  },
+});
+
+// Request Reset Token
+const requestResetPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: 'Email must be provided' });
+  }
+
+  try {
+    const account = await getAccountByEmailorUsername(email, null);
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+    console.log(account);
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const tokenExpiry = new Date(Date.now() + 3600000); // Token valid for 1 jam
+
+    await saveResetToken(email, resetToken, tokenExpiry);
+
+    const resetLink = `http://localhost:8000/reset-password?token=${resetToken}`;
+
+    await transporter.sendMail({
+      from: 'haritsazfa@gmail.com',
+      to: email,
+      subject: 'Password Reset Request',
+      text: `You requested a password reset. Click the link to reset your password: ${resetLink}`,
+    });
+
+    res.json({ message: 'Reset email sent successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error requesting password reset', details: err.message });
+  }
+};
+
+// Reset Password
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { newPassword } = req.body;
+
+  if (!token || !newPassword) {
+    return res.status(400).json({ error: 'Token and new password must be provided' });
+  }
+
+  try {
+    const account = await getAccountByResetToken(token);
+    if (!account) {
+      return res.status(400).json({ error: 'Invalid or expired token' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await updateAccount(account.id, { password: hashedPassword, reset_token: null, reset_token_expiry: null });
+
+    res.json({ message: 'Password reset successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error resetting password', details: err.message });
+  }
+};
+
 module.exports = {
-  getAccounts, addAccount, getAccount, editAccount, removeAccount
+  getAccounts, addAccount, getAccount, editAccount, removeAccount, requestResetPassword, resetPassword
 }
-// const db = require('../config/db');
-// const bcrypt = require('bcrypt');
-// const { createAccount, getAccountByEmailorUsername } = require('../models/accountModel');
-// const jwt = require('jsonwebtoken');
-
-// const AccountController = {
-//   createAccount: async (req, res) => {
-//     const { username, firstname, lastname, phonenumber, email, password } = req.body;
-
-//     if (!username || !firstname || !lastname || !phonenumber || !email || !password) {
-//       return res.status(400).json({ message: 'All fields are required.' });
-//     }
-
-//     try {
-//       // Hash the password before storing it
-//       const hashedPassword = await bcrypt.hash(password, 10);
-
-//       const data = {
-//         username,
-//         firstname,
-//         lastname,
-//         phonenumber,
-//         email,
-//         password: hashedPassword,
-//         regist_date: new Date(),
-//       };
-
-//       const result = await createAccount(data);
-
-//       res.status(201).json({
-//         message: 'Account created successfully.',
-//         accountId: result.insertId,
-//       });
-//     } catch (err) {
-//       console.error('Error creating account:', err.message);
-//       if (err.message === 'Email or username already in use.') {
-//         return res.status(409).json({ message: err.message });
-//       }
-//       res.status(500).json({ message: 'Server error.' });
-//     }
-//   },
-
-//   getAccount: async (req, res) => {
-//     const { email, password, rememberMe } = req.body;
-
-//     if (!email || !password) {
-//       return res.status(400).json({ message: 'Email and password are required.' });
-//     }
-
-//     try {
-//       const account = await getAccountByEmailorUsername(email);
-
-//       if (!account) {
-//         return res.status(404).json({ message: 'Invalid email or password.' });
-//       }
-
-//       // Verify password
-//       const isPasswordValid = await bcrypt.compare(password, account.password);
-//       if (!isPasswordValid) {
-//         return res.status(401).json({ message: 'Invalid email or password.' });
-//       }
-
-//       // Generate JWT
-//       const tokenPayload = {
-//         id: account.id,
-//         username: account.username,
-//         email: account.email,
-//       };
-
-//       const JWT_SECRET = process.env.JWT_SECRET;
-
-//       if (!JWT_SECRET) {
-//         throw new Error('JWT_SECRET is not set in environment variables');
-//       }
-
-//       const token = jwt.sign(tokenPayload, JWT_SECRET, {
-//         expiresIn: rememberMe ? '7d' : '1h',
-//       });
-
-//       // Update remember_token if rememberMe is true
-//       if (rememberMe) {
-//         account.remember_token = token;
-//         const updateSql = 'UPDATE accounts SET remember_token = ? WHERE id = ?';
-//         await db.query(updateSql, [token, account.id]);
-//       }
-
-
-//       res.json({
-//         message: 'Login successful.',
-//         token,
-//       });
-//     } catch (err) {
-//       console.error('Error logging in:', err.message);
-//       res.status(500).json({ message: 'Server error.' });
-//     }
-//   },
-// };
-
-// module.exports = AccountController;
