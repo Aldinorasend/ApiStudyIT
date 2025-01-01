@@ -9,10 +9,10 @@ const {
 
 const router = express.Router();
 
-router.get('/task', getTasks);        // GET semua item
-router.post('/task', addTask);       // POST item baru
-router.get('/task/:id', getTask);    // GET item berdasarkan ID
-router.put('/task/:id', editTask);   // PUT untuk update item
-router.delete('/task/:id', removeTask); // DELETE item
+router.get('/tasks', getTasks);        // GET semua item
+router.post('/tasks', addTask);       // POST item baru
+router.get('/tasks/:id', getTask);    // GET item berdasarkan ID
+router.put('/tasks/:id', editTask);   // PUT untuk update item
+router.delete('/tasks/:id', removeTask); // DELETE item
 
 module.exports = router;
