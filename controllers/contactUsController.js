@@ -4,7 +4,7 @@ const {
   getContactUsById,
   updateContactUs,
   deleteContactUs,
-} = require('../models/contactUsModel');
+} = require('../models/contactUsModel.js');
 
 // Mendapatkan semua contact_us
 const getContactUs = async (req, res) => {
