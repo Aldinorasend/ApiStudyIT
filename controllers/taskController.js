@@ -135,6 +135,7 @@ const addTask = async (req, res) => {
     try {
       // Dapatkan path foto dari database
       const photoPath = await getPhotoPathByID(id); // Pastikan fungsi ini sudah ada
+      console.log(`Photo path: ${photoPath}`);
       if (!photoPath) {
         return res.status(404).json({ error: 'Task not found or no photo associated' });
       }

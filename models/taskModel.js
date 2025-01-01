@@ -69,10 +69,11 @@ const getPhotoPathByID = async (id) => {
   const sql = 'SELECT FileTask FROM tasks WHERE id = ?';
   try {
     const [rows] = await db.query(sql, [id]);
-    return rows.length > 0 ? rows[0].image : null;
+    return rows.length > 0 ? rows[0].FileTask : null; // Ganti 'image' dengan 'FileTask'
   } catch (err) {
     throw err;
   }
 };
+
 
 module.exports = { getAllTasks, createTask, getTaskById,getTaskByIdCourse, updateTask, deleteTask, getPhotoPathByID };
