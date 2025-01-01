@@ -5,11 +5,12 @@ const {
     getCourseById,
     updateCourse,
     deleteCourse,
-    getPhotoPathById
+    getPhotoPathById,
+    getAllCoursesActive
   } = require('../models/courseModel');
   
   // Mendapatkan semua course
-  const getCourses = async (req, res) => {
+  const getCoursesForAdmin = async (req, res) => {
     try {
       const courses = await getAllCourses(); // Menggunakan async/await
       res.json(courses);
@@ -20,6 +21,15 @@ const {
   const getFreeCoursesForFreeUser = async (req, res) => {
     try {
       const courses = await getFreeCourses(); // Menggunakan async/await
+      res.json(courses);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching courses', details: err.message });
+    }
+  };
+
+  const getActiveCoursesForUser = async (req, res) => {
+    try {
+      const courses = await getAllCoursesActive(); // Menggunakan async/await
       res.json(courses);
     } catch (err) {
       res.status(500).json({ error: 'Error fetching courses', details: err.message });
@@ -165,5 +175,5 @@ const removeCourse = async (req, res) => {
 
   
   
-  module.exports = { getCourses, getFreeCoursesForFreeUser,addCourse, getCourse, editCourse, removeCourse, getPhotoPathById };
+  module.exports = { getActiveCoursesForUser, getCoursesForAdmin, getFreeCoursesForFreeUser,addCourse, getCourse, editCourse, removeCourse, getPhotoPathById };
   
