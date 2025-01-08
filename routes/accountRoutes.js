@@ -6,12 +6,15 @@ const {
     editAccount,
     removeAccount,
     requestResetPassword,
-    resetPassword
+    resetPassword,
+    getOneAccounts,
 } = require('../controllers/accountController');
 
 const router = express.Router();
 
 router.get('/Accounts', getAccounts);
+router.get('/Accounts/:id', getOneAccounts);
+
 router.post('/Accounts', addAccount);
 router.post('/Accounts/search', getAccount);
 router.put('/Accounts/:id', editAccount);
