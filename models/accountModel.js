@@ -9,7 +9,15 @@ const getAllAccounts = async () => {
     throw err;
   }
 };
-
+const getIdAccounts = async (id) => {
+  const sql = 'SELECT * FROM accounts where id = ?';
+  try {
+    const [results] = await db.query(sql, [id]);
+    return results[0];
+  } catch (err) {
+    throw err;
+  }
+};
 const createAccount = async (data) => {
   const sql = 'INSERT INTO accounts SET ?';
   try {
@@ -72,5 +80,5 @@ const getAccountByResetToken = async (token) => {
 };
 
 module.exports = {
-  getAllAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken
+  getAllAccounts,getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken
 }
