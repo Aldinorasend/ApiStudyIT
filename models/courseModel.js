@@ -15,7 +15,35 @@ const getAllCourses = async () => {
     throw err;
   }
 };
+const sortingCoursesByEndDateFree = async () => {
+  const sql = `
+  SELECT courses.*, instructors.firstname, instructors.lastname 
+  FROM courses
+  LEFT JOIN instructors ON courses.instructor_id = instructors.id
+  WHERE courses.status = 'active' AND  courses.level = 'beginner'
+  ORDER BY courses.end_date ASC;`;
+  try {
+    const [results] = await db.query(sql);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+};
 
+const sortingCoursesByEndDateSubs = async () => {
+  const sql = `
+  SELECT courses.*, instructors.firstname, instructors.lastname 
+  FROM courses
+  LEFT JOIN instructors ON courses.instructor_id = instructors.id
+  WHERE courses.status = 'active'
+  ORDER BY courses.end_date ASC;`;
+  try {
+    const [results] = await db.query(sql);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+};
 const getAllCoursesActive = async () => {
   const sql = `
     SELECT courses.*, instructors.firstname, instructors.lastname 
@@ -106,4 +134,4 @@ const getPhotoPathById = async (id) => {
     throw err;
   }
 };
-module.exports = { getAllCourses, getAllCoursesActive, getFreeCourses, createCourse, getCourseById, updateCourse, deleteCourse, getPhotoPathById };
+module.exports = { getAllCourses, getAllCoursesActive, sortingCoursesByEndDateFree,sortingCoursesByEndDateSubs,getFreeCourses, createCourse, getCourseById, updateCourse, deleteCourse, getPhotoPathById };
