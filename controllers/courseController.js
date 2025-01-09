@@ -6,7 +6,9 @@ const {
     updateCourse,
     deleteCourse,
     getPhotoPathById,
-    getAllCoursesActive
+    getAllCoursesActive,
+    sortingCoursesByEndDateFree,
+    sortingCoursesByEndDateSubs
   } = require('../models/courseModel');
   
   // Mendapatkan semua course
@@ -30,6 +32,22 @@ const {
   const getActiveCoursesForUser = async (req, res) => {
     try {
       const courses = await getAllCoursesActive(); // Menggunakan async/await
+      res.json(courses);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching courses', details: err.message });
+    }
+  };
+  const getBySortEndDateFree = async (req, res) => {
+    try {
+      const courses = await sortingCoursesByEndDateFree(); // Menggunakan async/await
+      res.json(courses);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching courses', details: err.message });
+    }
+  };
+  const getBySortEndDateSubs = async (req, res) => {
+    try {
+      const courses = await sortingCoursesByEndDateSubs(); // Menggunakan async/await
       res.json(courses);
     } catch (err) {
       res.status(500).json({ error: 'Error fetching courses', details: err.message });
@@ -175,5 +193,5 @@ const removeCourse = async (req, res) => {
 
   
   
-  module.exports = { getActiveCoursesForUser, getCoursesForAdmin, getFreeCoursesForFreeUser,addCourse, getCourse, editCourse, removeCourse, getPhotoPathById };
+  module.exports = { getActiveCoursesForUser, getBySortEndDateFree, getBySortEndDateSubs,getCoursesForAdmin, getFreeCoursesForFreeUser,addCourse, getCourse, editCourse, removeCourse, getPhotoPathById };
   
