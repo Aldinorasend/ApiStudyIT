@@ -49,6 +49,26 @@ const updateAccount = async (id, data) => {
   }
 };
 
+const updateAccount2FA = async (id, twofa_secret) => {
+  const sql = 'UPDATE accounts SET twofa_secret = ? WHERE id = ?';
+  try {
+    const [result] = await db.query(sql, [twofa_secret, id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const remove2FASecret = async (id) => {
+  const sql = 'UPDATE accounts SET twofa_secret = NULL WHERE id = ?';
+  try {
+    const [result] = await db.query(sql, [id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 const deleteAccount = async (id) => {
   const sql = 'DELETE FROM accounts WHERE id = ?';
   try {
@@ -80,5 +100,5 @@ const getAccountByResetToken = async (token) => {
 };
 
 module.exports = {
-  getAllAccounts,getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken
+  getAllAccounts,getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret
 }

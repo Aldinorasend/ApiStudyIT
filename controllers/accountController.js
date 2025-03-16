@@ -1,9 +1,116 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
+const speakeasy = require('speakeasy');
+const { V4: uuidv4 } = require('uuid');
 const {
-  getAllAccounts, getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken
+  getAllAccounts, getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret
 } = require('../models/accountModel');
+
+const enable2FA = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const account = await getAccountByEmailorUsername(email, null);
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    // Generate secret key untuk 2FA
+    const secret = speakeasy.generateSecret({ length: 20 });
+
+    // Simpan secret di database
+    await updateAccount2FA(account.id, secret.base32);
+
+    res.json({
+      message: '2FA enabled successfully',
+      secret: secret.otpauth_url, // URL ini digunakan untuk scan di aplikasi Authenticator
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Error enabling 2FA', details: err.message });
+  }
+};
+
+const verify2FA = async (req, res) => {
+  const { email, token } = req.body;
+
+  try {
+    const account = await getAccountByEmailorUsername(email, null);
+    if (!account || !account.twofa_secret) {
+      return res.status(400).json({ error: '2FA is not enabled for this account' });
+    }
+
+    // Verifikasi kode OTP dengan secret
+    const isValid = speakeasy.totp.verify({
+      secret: account.twofa_secret,
+      encoding: 'base32',
+      token,
+    });
+
+    if (!isValid) {
+      return res.status(401).json({ error: 'Invalid 2FA token' });
+    }
+
+    res.json({ message: '2FA verification successful' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error verifying 2FA', details: err.message });
+  }
+};
+
+const loginWith2FA = async (req, res) => {
+  const { email, username, password, token } = req.body;
+
+  try {
+    const account = await getAccountByEmailorUsername(email, username);
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    // Cek password
+    const isPasswordValid = await bcrypt.compare(password, account.password);
+    if (!isPasswordValid) {
+      return res.status(401).json({ error: 'Invalid email/username or password' });
+    }
+
+    // Jika 2FA tidak diaktifkan, langsung login
+    if (!account.twofa_secret) {
+      return res.json({ message: 'Login successful', user: account });
+    }
+
+    // Verifikasi kode OTP 2FA
+    const isValid = speakeasy.totp.verify({
+      secret: account.twofa_secret,
+      encoding: 'base32',
+      token,
+    });
+
+    if (!isValid) {
+      return res.status(401).json({ error: 'Invalid 2FA token' });
+    }
+
+    res.json({ message: 'Login successful with 2FA', user: account });
+  } catch (err) {
+    res.status(500).json({ error: 'Error logging in', details: err.message });
+  }
+};
+
+const disable2FA = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const account = await getAccountByEmailorUsername(email, null);
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    // Hapus secret 2FA dari database
+    await remove2FASecret(account.id);
+
+    res.json({ message: '2FA disabled successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error disabling 2FA', details: err.message });
+  }
+};
 
 const getAccounts = async (req, res) => {
   try {
@@ -52,7 +159,7 @@ const getAccount = async (req, res) => {
 
   try {
     const account = await getAccountByEmailorUsername(email, username);
-    console.log('Account fetched',account);
+    console.log('Account fetched', account);
     if (!account) {
       return res.status(404).json({ error: 'Account not found' });
     }
@@ -156,5 +263,5 @@ const resetPassword = async (req, res) => {
 };
 
 module.exports = {
-  getAccounts, addAccount, getOneAccounts, getAccount, editAccount, removeAccount, requestResetPassword, resetPassword
+  getAccounts, addAccount, getOneAccounts, getAccount, editAccount, removeAccount, requestResetPassword, resetPassword, enable2FA, verify2FA, loginWith2FA, disable2FA
 }
