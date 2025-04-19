@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer');
 const speakeasy = require('speakeasy');
 const { V4: uuidv4 } = require('uuid');
 const {
-  getAllAccounts, getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret
+  getAllAccounts, getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret, verifyOTP, activateAccount, updateOTP
 } = require('../models/accountModel');
 
 const enable2FA = async (req, res) => {
@@ -138,13 +138,77 @@ const addAccount = async (req, res) => {
     // Hash password sebelum menyimpan
     const hashedPassword = await bcrypt.hash(data.password, 10);  // 10 adalah salt rounds
     data.password = hashedPassword;
-
     data.regist_date = new Date();
 
+    const otp = Math.floor(1000 + Math.random() * 9000).toString(); // genearte 4 digit otp code
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins otp code
+
+    data.otp = otp;
+    data.otp_expiry = otpExpiry;
+
     const result = await createAccount(data);
-    res.json({ message: 'Account Created', id: result.insertId });
+
+    await transporter.sendMail({
+      from: 'haritsazfa@gmail.com',
+      to: data.email,
+      subject: 'StudyIT OTP Verification Code',
+      text: `Your OTP code is : ${otp} and it will expire in ${10} minutes`
+    });
+
+    res.json({ message: 'Account Created. Please Verify OTP code', id: result.insertId });
   } catch (err) {
     res.status(500).json({ error: 'Error creating Account', details: err.message });
+  }
+};
+
+const verifyAccountOTP = async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    const account = await verifyOTP(email, otp);
+    if (!account) {
+      return res.status(400).json({ error: 'Invalid or expired OTP' });
+    }
+
+    await activateAccount(email);
+    res.json({ message: 'Account verified successfully, you can now login.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error verifying OTP', details: err.message });
+  }
+};
+
+const resendOTP = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  try {
+    const account = await getAccountByEmailorUsername(email);
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    if (account.is_verified) {
+      return res.status(400).json({ error: 'Account already verified' });
+    }
+
+    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 menit
+
+    await updateOTP(email, otp, expiry);
+
+    await transporter.sendMail({
+      from: 'haritsazfa@gmail.com',
+      to: email,
+      subject: 'Resend OTP - StudyIT',
+      text: `Here is your new OTP: ${otp}. It is valid for 5 minutes.`,
+    });
+
+    res.json({ message: 'New OTP sent successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error resending OTP', details: err.message });
   }
 };
 
@@ -263,5 +327,5 @@ const resetPassword = async (req, res) => {
 };
 
 module.exports = {
-  getAccounts, addAccount, getOneAccounts, getAccount, editAccount, removeAccount, requestResetPassword, resetPassword, enable2FA, verify2FA, loginWith2FA, disable2FA
+  getAccounts, addAccount, getOneAccounts, getAccount, editAccount, removeAccount, requestResetPassword, resetPassword, enable2FA, verify2FA, loginWith2FA, disable2FA, verifyAccountOTP, resendOTP
 }
