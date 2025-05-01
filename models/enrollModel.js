@@ -1,6 +1,29 @@
 const db = require('../config/db');
 
 // Mendapatkan semua enrolls
+const getStudentsEnrolls = async (UserID) => {
+  const sql = `
+    SELECT 
+    enrollments.id,
+    accounts.firstname AS Students_FirstName, 
+    accounts.lastname AS Students_LastName,
+    courses.course_name AS Courses_Name, 
+    instructors.firstname AS Instructors_FirstName, 
+    instructors.lastname AS Instructors_LastName,
+    enrollments.Progress
+        FROM enrollments
+        LEFT JOIN accounts ON enrollments.UserID = accounts.id  
+        LEFT JOIN courses ON enrollments.CourseID = courses.id  
+        LEFT JOIN instructors ON courses.instructor_id = instructors.id  
+    WHERE enrollments.UserID = ?
+  `;
+  try {
+    const [results] = await db.query(sql, [UserID]);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+}
 const getAllEnrolls = async () => {
   const sql = `
     SELECT enrolls.*, accounts.firstname, accounts.lastname 
@@ -64,4 +87,4 @@ const deleteEnroll = async (id) => {
     throw err;
   }
 };
-module.exports = { getAllEnrolls, createEnroll, getEnrollById, updateEnroll, deleteEnroll};
+module.exports = { getAllEnrolls, getStudentsEnrolls, createEnroll, getEnrollById, updateEnroll, deleteEnroll};

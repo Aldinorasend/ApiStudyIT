@@ -23,6 +23,6 @@ router.get('/freecourses', getFreeCoursesForFreeUser);        // GET semua cours
 router.post('/courses', addCourse);       // POST course baru
 router.get('/courses/:id', getCourse);    // GET course berdasarkan ID
 router.put('/courses/:id', editCourse);   // PUT untuk update course
-router.delete('/coursesAdmin/:id', removeCourse); // DELETE course
+router.put('/coursesAdmin/:id', removeCourse); // DELETE course
 
 module.exports = router;

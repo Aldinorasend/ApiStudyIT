@@ -11,8 +11,8 @@ const router = express.Router();
 
 router.get('/instructors', getInstructors);        // GET semua instructor
 router.post('/instructors', addInstructor);       // POST instructor baru
-router.get('/instructors/:id', getInstructor);    // GET instructor berdasarkan ID
+router.get('/instructors/:id', getInstructors);    // GET instructor berdasarkan ID
 router.put('/instructors/:id', editInstructor);   // PUT untuk update instructor
-router.delete('/instructors/:id', removeInstructor); // DELETE instructor
+router.put('/instructors/deactivate/:id', removeInstructor); // DELETE instructor
 
-module.exports = router;
+module.exports = router;  

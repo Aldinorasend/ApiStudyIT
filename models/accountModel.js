@@ -9,6 +9,16 @@ const getAllAccounts = async () => {
     throw err;
   }
 };
+
+const getStudentAccounts = async () => {
+  const sql = 'SELECT * FROM accounts WHERE User_Type ="Free" OR User_Type ="Subscriber"';
+  try {
+    const [results] = await db.query(sql);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+};
 const getIdAccounts = async (id) => {
   const sql = 'SELECT * FROM accounts where id = ?';
   try {
@@ -80,5 +90,5 @@ const getAccountByResetToken = async (token) => {
 };
 
 module.exports = {
-  getAllAccounts,getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken
+  getAllAccounts,getStudentAccounts,getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken
 }

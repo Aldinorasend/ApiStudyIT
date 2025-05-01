@@ -2,7 +2,7 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const {
-  getAllAccounts, getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken
+  getAllAccounts, getStudentAccounts,getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken
 } = require('../models/accountModel');
 
 const getAccounts = async (req, res) => {
@@ -13,7 +13,14 @@ const getAccounts = async (req, res) => {
     res.status(500).json({ error: 'Error fetching Accounts', details: err.message });
   }
 };
-
+const getStudAccounts = async (req, res) => {
+  try {
+    const items = await getStudentAccounts(); // Menggunakan async/await
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching Accounts', details: err.message });
+  }
+};
 const getOneAccounts = async (req, res) => {
   const id = req.params.id;
   try {
@@ -156,5 +163,5 @@ const resetPassword = async (req, res) => {
 };
 
 module.exports = {
-  getAccounts, addAccount, getOneAccounts, getAccount, editAccount, removeAccount, requestResetPassword, resetPassword
+  getAccounts, addAccount, getStudAccounts,getOneAccounts, getAccount, editAccount, removeAccount, requestResetPassword, resetPassword
 }

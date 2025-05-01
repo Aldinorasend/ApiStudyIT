@@ -2,10 +2,10 @@ const mysql = require('mysql2/promise');
 
 // Konfigurasi koneksi database menggunakan pool
 const pool = mysql.createPool({
-  host: '153.92.15.44',
-  user: 'u229098060_studyittubes',
-  password: 'TubesSmt5',
-  database: 'u229098060_studyitfinal',
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'studyitv3',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,

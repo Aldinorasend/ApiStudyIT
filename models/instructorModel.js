@@ -56,7 +56,7 @@ const updateInstructor = async (id, data) => {
 
 // Menghapus instructor
 const deleteInstructor = async (id) => {
-  const sql = 'DELETE FROM instructors WHERE id = ?';
+  const sql = 'UPDATE instructors SET status = "inactive" WHERE id = ?';
   try {
     const [result] = await db.query(sql, [id]);
     return result;
@@ -64,5 +64,6 @@ const deleteInstructor = async (id) => {
     throw err;
   }
 };
+
 
 module.exports = { getAllInstructors, getTotalInstructors, createInstructor, getInstructorById, updateInstructor, deleteInstructor };
