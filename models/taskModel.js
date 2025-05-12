@@ -21,7 +21,38 @@ const createTask = async (data) => {
     throw err;
   }
 };
+const getTaskByUserId = async (UserID, CourseID) => {
+  const sql = `SELECT 
+      tasks.id,
+      courses.course_name AS Courses_Name, 
+      accounts.firstname AS Students_FirstName, 
+      accounts.lastname AS Students_LastName,
+      moduls.Title AS Modul_Name,
+      tasks.FileTask,
+      tasks.Status
+    FROM tasks
+    LEFT JOIN moduls ON tasks.ModulID = moduls.id  
+    LEFT JOIN courses ON moduls.CourseID = courses.id 
+    LEFT JOIN enrollments ON tasks.EnrollID = enrollments.id
+    LEFT JOIN accounts ON enrollments.UserID = accounts.id  
+    WHERE enrollments.UserID = ? AND enrollments.CourseID = ?`;
+  try {
+    const [results] = await db.query(sql, [UserID, CourseID]);
+    return results; // Mengembalikan hanya satu task
+  } catch (err) {
+    throw err;
+  }
+};
 
+const ApproveTask = async (id) => {
+  const sql = 'UPDATE tasks SET Status = "Completed" WHERE id = ?';
+  try {
+    const [result] = await db.query(sql, [id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
 // Mendapatkan task berdasarkan ID
 const getTaskById = async (id) => {
   const sql = 'SELECT * FROM tasks WHERE id = ?';
@@ -76,4 +107,4 @@ const getPhotoPathByID = async (id) => {
 };
 
 
-module.exports = { getAllTasks, createTask, getTaskById,getTaskByIdCourse, updateTask, deleteTask, getPhotoPathByID };
+module.exports = { getAllTasks, createTask, getTaskById,getTaskByUserId,ApproveTask,getTaskByIdCourse, updateTask, deleteTask, getPhotoPathByID };
