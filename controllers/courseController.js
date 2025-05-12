@@ -172,14 +172,14 @@ const removeCourse = async (req, res) => {
     }
 
     // Hapus file foto dari folder uploads
-    const filePath = path.resolve(__dirname, '../uploads', photoPath); // Path absolut
-    try {
-      // Pastikan fs.unlink tidak menggunakan callback
-      await fst.unlink(filePath);
-      console.log(`File deleted: ${filePath}`);
-    } catch (fileErr) {
-      console.warn(`Failed to delete file: ${filePath}. Error: ${fileErr.message}`);
-    }
+    // const filePath = path.resolve(__dirname, '../uploads', photoPath); // Path absolut
+    // try {
+    //   // Pastikan fs.unlink tidak menggunakan callback
+    //   await fst.unlink(filePath);
+    //   console.log(`File deleted: ${filePath}`);
+    // } catch (fileErr) {
+    //   console.warn(`Failed to delete file: ${filePath}. Error: ${fileErr.message}`);
+    // }
 
     // Hapus course dari database
     await deleteCourse(id); // Pastikan fungsi ini sudah ada

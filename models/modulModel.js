@@ -37,7 +37,7 @@ const getModulByIdCourse = async (CourseID) => {
   const sql = 'SELECT * FROM moduls WHERE CourseID = ?';
   try {
     const [results] = await db.query(sql, [CourseID]);
-    return results[0]; // Mengembalikan hanya satu modul
+    return results;// Mengembalikan hanya satu modul
   } catch (err) {
     throw err;
   }

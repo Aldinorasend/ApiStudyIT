@@ -4,7 +4,8 @@ const nodemailer = require('nodemailer');
 const speakeasy = require('speakeasy');
 const { V4: uuidv4 } = require('uuid');
 const {
-  getAllAccounts, getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret
+
+  getAllAccounts, getStudentAccounts,getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret
 } = require('../models/accountModel');
 
 const enable2FA = async (req, res) => {
@@ -120,7 +121,14 @@ const getAccounts = async (req, res) => {
     res.status(500).json({ error: 'Error fetching Accounts', details: err.message });
   }
 };
-
+const getStudAccounts = async (req, res) => {
+  try {
+    const items = await getStudentAccounts(); // Menggunakan async/await
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching Accounts', details: err.message });
+  }
+};
 const getOneAccounts = async (req, res) => {
   const id = req.params.id;
   try {
@@ -263,5 +271,8 @@ const resetPassword = async (req, res) => {
 };
 
 module.exports = {
-  getAccounts, addAccount, getOneAccounts, getAccount, editAccount, removeAccount, requestResetPassword, resetPassword, enable2FA, verify2FA, loginWith2FA, disable2FA
+
+
+  getAccounts, addAccount, getStudAccounts,getOneAccounts, getAccount, editAccount, removeAccount, requestResetPassword, resetPassword, enable2FA, verify2FA, loginWith2FA, disable2FA
+
 }

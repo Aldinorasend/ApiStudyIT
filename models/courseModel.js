@@ -116,7 +116,7 @@ const updateCourse = async (id, data) => {
 
 // Menghapus course
 const deleteCourse = async (id) => {
-  const sql = 'DELETE FROM courses WHERE id = ?';
+  const sql = 'UPDATE courses SET status = "inactive" WHERE id = ? ';
   try {
     const [result] = await db.query(sql, [id]);
     return result;
