@@ -8,6 +8,7 @@ const {
   editEnroll,
   removeEnroll,
   updateProgress,
+  paymentRequest,
 } = require('../controllers/enrollController');
 
 const router = express.Router();
@@ -15,7 +16,7 @@ const router = express.Router();
 router.get('/enrolls', getEnrolls);
 router.get('/studentsEnrolls/:UserID', getStudEnrolls);        // GET semua enroll for Admin
 router.get('/studentEnrolls/:UserID', getStudyEnrolls);        // GET semua enroll for Students
-
+router.post('/payments', paymentRequest); // GET semua enroll for Students
 router.post('/enrolls', addEnroll);       // POST enroll baru
 router.get('/enrolls/:id', getEnroll);    // GET enroll berdasarkan ID
 router.put('/enrolls/:id', editEnroll);   // PUT untuk update enroll
