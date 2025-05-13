@@ -8,7 +8,7 @@ const {
     requestResetPassword,
     resetPassword,
     getOneAccounts,
-    getStudAccounts
+    getStudAccounts,
     enable2FA,
     verify2FA,
     loginWith2FA,

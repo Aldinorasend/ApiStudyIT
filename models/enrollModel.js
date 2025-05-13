@@ -63,7 +63,8 @@ LEFT JOIN instructors i ON c.instructor_id = i.id
 WHERE 
     e.UserID = ?    AND c.status = 'active' 
 ORDER BY 
-    e.CourseID ASC;
+    e.CourseID ASC 
+    LIMIT 3;
   `;
   try {
     const [results] = await db.query(sql, [UserID]);
@@ -172,4 +173,18 @@ const deleteEnroll = async (id) => {
     throw err;
   }
 };
-module.exports = { getAllEnrolls, getStudentsEnrolls, getStudentsEnrollsForUser,UpdatedProgress,getEnrollmentByCourseAndUser ,createEnroll, getEnrollById, updateEnroll, deleteEnroll };
+const paymentReqModel = async (data) => {
+  const sql = `
+    INSERT INTO subscribers SET ?`;
+  try {
+    const [results] = await db.query(sql, data);
+    console.log('Payment request inserted:', results);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+}
+module.exports = { 
+  getAllEnrolls, getStudentsEnrolls, getStudentsEnrollsForUser,UpdatedProgress,getEnrollmentByCourseAndUser ,createEnroll, getEnrollById, updateEnroll, deleteEnroll,
+  paymentReqModel 
+};

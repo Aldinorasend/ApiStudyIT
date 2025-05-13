@@ -7,6 +7,7 @@ const {
     getStudentsEnrolls,
     getStudentsEnrollsForUser,
     UpdatedProgress,
+    paymentReqModel,
   } = require('../models/enrollModel');
   
   // Mendapatkan semua enroll
@@ -26,7 +27,6 @@ const {
 
   const getStudyEnrolls = async (req, res) => {
     const UserID = req.params.UserID;
-    console.log('Checking enrollments for user_id in Student Page:', UserID);
     try {
       const enrolls = await getStudentsEnrollsForUser(UserID); // Menggunakan async/await
       if (enrolls.length === 0) {
@@ -106,6 +106,21 @@ const {
       res.status(500).json({ error: 'Error deleting enroll', details: err.message });
     }
   };
+
+  const paymentRequest = async (req, res) => {
+    const data = req.body;
+    try {
+      const payments = await paymentReqModel(data); // Menggunakan async/await
+      if (payments.length === 0) {
+        return res.status(404).json({ error: 'Enrollments not found for this user' });
+      }      
+      res.json(payments);
+    } catch (err) {
+      res.status(500).json({ error: 'Error processing payments', details: err.message });
+    }
+  }
   
-  module.exports = { getEnrolls, addEnroll, getEnroll, editEnroll, getStudEnrolls, getStudyEnrolls,removeEnroll, updateProgress };
+  module.exports = { 
+    getEnrolls, addEnroll, getEnroll, editEnroll, getStudEnrolls, getStudyEnrolls,removeEnroll, updateProgress, paymentRequest 
+  };
   
