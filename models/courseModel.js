@@ -15,6 +15,20 @@ const getAllCourses = async () => {
     throw err;
   }
 };
+
+const getRatingByIdModel = async (id) => {
+  const sql = `
+    SELECT ROUND(AVG(rating) / 2)  AS average_rating
+    FROM course_rating 
+    WHERE course_id = ?;
+  `;
+  try {
+    const [results] = await db.query(sql, [id]);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+};
 const sortingCoursesByEndDateFree = async () => {
   const sql = `
   SELECT courses.*, instructors.firstname, instructors.lastname 
@@ -134,4 +148,8 @@ const getPhotoPathById = async (id) => {
     throw err;
   }
 };
-module.exports = { getAllCourses, getAllCoursesActive, sortingCoursesByEndDateFree,sortingCoursesByEndDateSubs,getFreeCourses, createCourse, getCourseById, updateCourse, deleteCourse, getPhotoPathById };
+module.exports = { 
+  getAllCourses, getAllCoursesActive, sortingCoursesByEndDateFree,sortingCoursesByEndDateSubs,
+  getFreeCourses, createCourse, getCourseById, updateCourse, 
+  deleteCourse, getPhotoPathById, getRatingByIdModel 
+};

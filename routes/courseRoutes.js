@@ -9,7 +9,8 @@ const {
   getCoursesForAdmin,
   getActiveCoursesForUser,
   getBySortEndDateFree,
-  getBySortEndDateSubs
+  getBySortEndDateSubs,
+  getRatingById,
 } = require('../controllers/courseController');
 
 const router = express.Router();
@@ -22,6 +23,8 @@ router.get('/coursesAdmin', getCoursesForAdmin);
 router.get('/freecourses', getFreeCoursesForFreeUser);        // GET semua course
 router.post('/courses', addCourse);       // POST course baru
 router.get('/courses/:id', getCourse);    // GET course berdasarkan ID
+router.get('/coursesRating/:id', getRatingById);    // GET course berdasarkan ID
+
 router.put('/courses/:id', editCourse);   // PUT untuk update course
 router.put('/coursesAdmin/:id', removeCourse); // DELETE course
 

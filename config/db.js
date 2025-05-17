@@ -6,15 +6,9 @@ const pool = mysql.createPool({
   user: 'root',
   password: '',
 
-<<<<<<< HEAD
   database: 'studyitv3',
 
   // database: 'studyitfinal',
-=======
-//   database: 'studyitv3',
-
-  database: 'studyitfinal',
->>>>>>> db05422bfee0025d7c6c784ecc1a8c08cd43578b
 
   waitForConnections: true,
   connectionLimit: 10,
