@@ -25,7 +25,6 @@ const getStudentsEnrolls = async (UserID) => {
     throw err;
   }
 }
-
 const getStudentsEnrollsForUser = async (UserID) => {
   const sql = `
     SELECT 
@@ -63,11 +62,58 @@ LEFT JOIN instructors i ON c.instructor_id = i.id
 WHERE 
     e.UserID = ?    AND c.status = 'active' 
 ORDER BY 
-    e.CourseID ASC 
-    LIMIT 3;
+    e.CourseID ASC;
   `;
   try {
     const [results] = await db.query(sql, [UserID]);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+}
+const searchCourseModel = async (UserID, courseName) => {
+  const sql = `
+    SELECT 
+    e.id,
+    a.username AS Students_Username,
+    e.CourseID,
+    c.course_name AS Courses_Name,
+    c.level AS Courses_Level,
+    c.status AS Courses_Status,
+    c.image AS Courses_Image,
+    e.Progress,
+    (SELECT COUNT(*) 
+     FROM enrollments e2 
+     JOIN courses c2 ON e2.CourseID = c2.id 
+     WHERE e2.UserID = e.UserID 
+     AND c2.status = 'active' 
+     AND c2.end_date >= CURDATE()
+     AND e2.Progress < 100) AS total_upcoming_incomplete_courses,
+    (SELECT COUNT(*) 
+     FROM enrollments e3
+     JOIN courses c3 ON e3.CourseID = c3.id
+     WHERE e3.UserID = e.UserID
+     AND c3.status = 'active') AS total_active_courses,
+    ROUND(
+      (SELECT SUM(e4.progress) / COUNT(e4.id)
+     FROM enrollments e4 
+      JOIN courses c4 ON e4.CourseID = c4.id
+      WHERE e4.UserID = e.UserID
+      AND c4.status = 'active') , 0) AS average_progress
+FROM 
+    enrollments e
+LEFT JOIN accounts a ON e.UserID = a.id  
+LEFT JOIN courses c ON e.CourseID = c.id  
+LEFT JOIN instructors i ON c.instructor_id = i.id  
+WHERE 
+    e.UserID = ? 
+    AND c.status = 'active' 
+    AND c.course_name LIKE CONCAT('%', ?, '%')
+ORDER BY 
+    e.CourseID ASC;
+  `;
+  try {
+    const [results] = await db.query(sql, [UserID, courseName]);
     return results;
   } catch (err) {
     throw err;
@@ -102,7 +148,7 @@ const getAllEnrolls = async () => {
 
 // Menambahkan enroll baru
 const createEnroll = async (data) => {
-  const sql = 'INSERT INTO enrolls SET ?';
+  const sql = 'INSERT INTO enrollments SET ?';
   try {
     const [result] = await db.query(sql, data);
     return result;
@@ -185,6 +231,7 @@ const paymentReqModel = async (data) => {
   }
 }
 module.exports = { 
-  getAllEnrolls, getStudentsEnrolls, getStudentsEnrollsForUser,UpdatedProgress,getEnrollmentByCourseAndUser ,createEnroll, getEnrollById, updateEnroll, deleteEnroll,
-  paymentReqModel 
+  getAllEnrolls, getStudentsEnrolls, getStudentsEnrollsForUser,UpdatedProgress,
+  getEnrollmentByCourseAndUser ,createEnroll, getEnrollById, updateEnroll, 
+  deleteEnroll,paymentReqModel, searchCourseModel 
 };
