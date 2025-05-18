@@ -109,9 +109,35 @@ const getAccountByResetToken = async (token) => {
   }
 };
 
+const verifyOTP = async (email, otp) => {
+  const sql = 'SELECT * FROM accounts WHERE email = ? AND otp = ? AND otp_expiry > NOW()';
+  try {
+    const [results] = await db.query(sql, [email, otp]);
+    return results[0] || null;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const activateAccount = async (email) => {
+  const sql = 'UPDATE accounts SET User_Type = "Free", otp = NULL, otp_expiry = NULL, is_verified = TRUE WHERE email = ?';
+  try {
+    const [result] = await db.query(sql, [email]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const updateOTP = async (email, otp, expiry) => {
+  const sql = 'UPDATE accounts SET otp = ?, otp_expiry = ? WHERE email = ?';
+  try {
+    await db.query(sql, [otp, expiry, email]);
+  } catch (err) {
+    throw err;
+  }
+};
+
 module.exports = {
 
-
-  getAllAccounts,getStudentAccounts,getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret
-
-}
+  getAllAccounts,getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret, verifyOTP, activateAccount, updateOTP
