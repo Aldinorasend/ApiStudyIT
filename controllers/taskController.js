@@ -4,9 +4,11 @@ const {
     getTaskById,
     updateTask,
     deleteTask,
-    getPhotoPathByID
+    getPhotoPathByID,
+    getTaskByUserId,
   } = require('../models/taskModel');
-  
+const taskModel = require('../models/taskModel');
+const enrollModel = require('../models/enrollModel');
   // Mendapatkan semua task
   const getTasks = async (req, res) => {
     try {
@@ -17,6 +19,63 @@ const {
     }
   };
 
+  const approveTaskAndUpdateProgress = async (req, res) => {
+    const { id } = req.params;
+    
+    try {
+      // 1. Approve the task (set status to "Completed")
+      await taskModel.ApproveTask(id);
+      
+      // 2. Get the task details including EnrollID 
+      const task = await taskModel.getTaskById(id);
+      if (!task) {
+        return res.status(404).json({ error: 'Task not found' });
+      }
+      console.log("EnrollId:",task.EnrollID, "TaskID:",task.id)
+      // 3. Get the enrollment details
+      const user = await enrollModel.getEnrollById(task.EnrollID);
+      console.log("UserId",user.UserID, "CourseId",user.CourseID)
+      const enrollments = await enrollModel.getEnrollmentByCourseAndUser(user.UserID, user.CourseID);
+      console.log("Enrollments:",enrollments) 
+      if (!enrollments || enrollments.length === 0) {
+        return res.status(404).json({ error: 'Enrollment not found' });
+      }
+      const enrollment = enrollments[0];
+      
+      // 4. Update the progress for this enrollment
+      await enrollModel.UpdatedProgress(enrollment.UserID);
+      
+      // 5. Get the updated enrollment to return
+      const updatedEnrollment = (await enrollModel.getStudentsEnrolls(enrollment.UserID))
+        .find(e => e.CourseID === enrollment.CourseID);
+      
+      res.json({
+        success: true,
+        message: 'Task approved and progress updated',
+        task: await taskModel.getTaskById(id),
+        enrollment: updatedEnrollment
+        
+      });
+      console.log(updatedEnrollment);
+    } catch (error) {
+      console.error('Error approving task:', error);
+      res.status(500).json({ 
+        success: false,
+        error: error.message 
+      });
+    }
+  };
+
+  const getTaskByIdUser = async (req, res) => {
+    const UserID = req.params.UserID;
+    const CourseID = req.params.CourseID;
+    try {
+      const tasks = await getTaskByUserId(UserID, CourseID); // Menggunakan async/await
+      res.json(tasks);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching tasks by Task ID', details: err.message });
+    }
+  };
   const getTasksByTaskID = async (req, res) => {
     const TaskID = req.params.TaskID;
     try {
@@ -164,5 +223,5 @@ const addTask = async (req, res) => {
    
    
 
-  module.exports = { getTasks, addTask, getTask, editTask, removeTask, getTasksByTaskID };
+  module.exports = { getTasks, addTask, getTask, approveTaskAndUpdateProgress, editTask, removeTask, getTasksByTaskID, getTaskByIdUser };
   

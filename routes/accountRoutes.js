@@ -8,9 +8,11 @@ const {
     requestResetPassword,
     resetPassword,
     getOneAccounts,
+    getStudAccounts,
     enable2FA,
     verify2FA,
     loginWith2FA,
+
     disable2FA,
     verifyAccountOTP,
     resendOTP
@@ -20,6 +22,7 @@ const router = express.Router();
 
 router.get('/Accounts', getAccounts);
 router.get('/Accounts/:id', getOneAccounts);
+router.get('/StudentAccounts', getStudAccounts);
 
 router.post('/Accounts', addAccount);
 router.post('/Accounts/search', getAccount);
