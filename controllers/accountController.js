@@ -241,10 +241,10 @@ const getAccount = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Invalid email/username or password' });
     }
-    // const isVerified = await account.isVerified;
-    // if (!isVerified) {
-    //   return res.status(401).json({ error: 'Account is not verified'});
-    // }
+    console.log("kondisi akun:",account.is_verified);
+    if (!account.is_verified || account.is_verified === 0) {
+      return res.status(401).json({ error: 'Account is not verified' });
+    }
     res.json(account);
   } catch (err) {
     res.status(500).json({ error: 'Error fetching Account', details: err.message });
