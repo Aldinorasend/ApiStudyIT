@@ -8,7 +8,8 @@ const {
     getPhotoPathById,
     getAllCoursesActive,
     sortingCoursesByEndDateFree,
-    sortingCoursesByEndDateSubs
+    sortingCoursesByEndDateSubs,
+    getRatingByIdModel
   } = require('../models/courseModel');
   
   // Mendapatkan semua course
@@ -131,7 +132,16 @@ const addCourse = async (req, res) => {
 };
 
 
-
+const getRatingById = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const course = await getRatingByIdModel(id);
+    if (!course) return res.status(404).json({ error: 'Course not found' });
+    res.json(course);
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching course', details: err.message });
+  }
+};
 
   // Mendapatkan course berdasarkan ID
   const getCourse = async (req, res) => {
@@ -172,14 +182,14 @@ const removeCourse = async (req, res) => {
     }
 
     // Hapus file foto dari folder uploads
-    const filePath = path.resolve(__dirname, '../uploads', photoPath); // Path absolut
-    try {
-      // Pastikan fs.unlink tidak menggunakan callback
-      await fst.unlink(filePath);
-      console.log(`File deleted: ${filePath}`);
-    } catch (fileErr) {
-      console.warn(`Failed to delete file: ${filePath}. Error: ${fileErr.message}`);
-    }
+    // const filePath = path.resolve(__dirname, '../uploads', photoPath); // Path absolut
+    // try {
+    //   // Pastikan fs.unlink tidak menggunakan callback
+    //   await fst.unlink(filePath);
+    //   console.log(`File deleted: ${filePath}`);
+    // } catch (fileErr) {
+    //   console.warn(`Failed to delete file: ${filePath}. Error: ${fileErr.message}`);
+    // }
 
     // Hapus course dari database
     await deleteCourse(id); // Pastikan fungsi ini sudah ada
@@ -193,5 +203,9 @@ const removeCourse = async (req, res) => {
 
   
   
-  module.exports = { getActiveCoursesForUser, getBySortEndDateFree, getBySortEndDateSubs,getCoursesForAdmin, getFreeCoursesForFreeUser,addCourse, getCourse, editCourse, removeCourse, getPhotoPathById };
+  module.exports = { 
+    getActiveCoursesForUser, getBySortEndDateFree, getBySortEndDateSubs,getCoursesForAdmin, 
+    getFreeCoursesForFreeUser,addCourse, getCourse, editCourse, 
+    removeCourse, getPhotoPathById, getRatingById 
+  };
   

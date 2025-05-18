@@ -38,7 +38,7 @@ const getPaginatedInstructors = async (req, res) => {
 const getInstructors = async (req, res) => {
   // Extract pagination parameters from the query string
   const page = parseInt(req.query.page, 10) || 1; // Default to page 1
-  const limit = parseInt(req.query.limit, 10) || 10; // Default to 10 items per page
+  const limit = parseInt(req.query.limit, 5) || 5; // Default to 10 items per page
   const offset = (page - 1) * limit; // Calculate the offset for SQL query
 
   try {
@@ -106,13 +106,18 @@ const editInstructor = async (req, res) => {
 
 // Menghapus instructor
 const removeInstructor = async (req, res) => {
-  const id = req.params.id;
+  console.log('deactivate instructor', req.params);
+
+  const { id } = req.params;
   try {
-    await deleteInstructor(id);
-    res.json({ message: 'Instructor deleted' });
-  } catch (err) {
-    res.status(500).json({ error: 'Error deleting instructor', details: err.message });
+    const result = await deleteInstructor(id);
+    res.json({ message: 'Instructor deactivated successfully', result });
+  } catch (error) {
+    console.error('Error in removeInstructor:', error);
+    res.status(500).json({ message: 'Failed to deactivate instructor' });
+    console.log('Failed to deactivate instructor', error);
   }
 };
+
 
 module.exports = { getInstructors, getPaginatedInstructors,addInstructor, getInstructor, editInstructor, removeInstructor };
