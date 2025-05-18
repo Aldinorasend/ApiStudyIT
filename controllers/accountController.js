@@ -5,7 +5,11 @@ const speakeasy = require('speakeasy');
 const { V4: uuidv4 } = require('uuid');
 const {
 
-  getAllAccounts, getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret, verifyOTP, activateAccount, updateOTP
+
+  getAllAccounts, getStudentAccounts,getIdAccounts,getProfilesModel, 
+  createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, 
+  saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret,
+  verifyOTP, activateAccount, updateOTP
 
 
 } = require('../models/accountModel');
@@ -272,7 +276,16 @@ const removeAccount = async (req, res) => {
     res.status(500).json({ error: 'Error deleting Account', details: err.message });
   }
 };
-
+const getProfiles = async (req, res) => {
+  const user_id = req.params.user_id;
+  try {
+    const profiles = await getProfilesModel(user_id);
+    if (!profiles) return res.status(404).json({ error: 'Profile not found' });
+    res.json(profiles);
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching profile', details: err.message });
+  }
+}
 // Konfigurasi Nodemailer
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
@@ -341,5 +354,12 @@ const resetPassword = async (req, res) => {
 };
 
 module.exports = {
+  getAccounts, addAccount, getStudAccounts,getOneAccounts, getAccount, 
+  editAccount, removeAccount, requestResetPassword, resetPassword, 
+  enable2FA, verify2FA, loginWith2FA, disable2FA, getProfiles,
+  verifyAccountOTP, resendOTP
 
-  getAccounts, addAccount, getOneAccounts, getAccount, editAccount, removeAccount, requestResetPassword, resetPassword, enable2FA, verify2FA, loginWith2FA, disable2FA, verifyAccountOTP, resendOTP
+}
+
+
+ 

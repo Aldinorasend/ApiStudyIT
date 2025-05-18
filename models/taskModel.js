@@ -21,6 +21,29 @@ const createTask = async (data) => {
     throw err;
   }
 };
+const getTaskByEnrollId = async (EnrollID, ModulID) => {
+  const sql = `SELECT 
+      tasks.id,
+      courses.course_name AS Courses_Name, 
+      accounts.firstname AS Students_FirstName, 
+      accounts.lastname AS Students_LastName,
+      moduls.Title AS Modul_Name,
+      tasks.FileTask,
+      tasks.Status,
+      tasks.SubmittedAt
+    FROM tasks
+    LEFT JOIN moduls ON tasks.ModulID = moduls.id  
+    LEFT JOIN courses ON moduls.CourseID = courses.id 
+    LEFT JOIN enrollments ON tasks.EnrollID = enrollments.id
+    LEFT JOIN accounts ON enrollments.UserID = accounts.id  
+    WHERE enrollments.id = ? AND tasks.ModulID = ?`;
+  try {
+    const [results] = await db.query(sql, [EnrollID, ModulID]);
+    return results; // Mengembalikan hanya satu task
+  } catch (err) {
+    throw err;
+  }
+};
 const getTaskByUserId = async (UserID, CourseID) => {
   const sql = `SELECT 
       tasks.id,
@@ -107,4 +130,8 @@ const getPhotoPathByID = async (id) => {
 };
 
 
-module.exports = { getAllTasks, createTask, getTaskById,getTaskByUserId,ApproveTask,getTaskByIdCourse, updateTask, deleteTask, getPhotoPathByID };
+module.exports = { 
+  getAllTasks, createTask, getTaskById,getTaskByUserId,
+  ApproveTask,getTaskByIdCourse, updateTask, deleteTask, 
+  getPhotoPathByID, getTaskByEnrollId 
+};

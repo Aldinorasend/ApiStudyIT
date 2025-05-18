@@ -28,6 +28,16 @@ const getIdAccounts = async (id) => {
     throw err;
   }
 };
+
+const getProfilesModel = async (user_id) => {
+  const sql = 'SELECT * FROM profiles where user_id = ?';
+  try {
+    const [results] = await db.query(sql, [user_id]);
+    return results[0];
+  } catch (err) {
+    throw err;
+  }
+};
 const createAccount = async (data) => {
   const sql = 'INSERT INTO accounts SET ?';
   try {
@@ -139,5 +149,8 @@ const updateOTP = async (email, otp, expiry) => {
 };
 
 module.exports = {
-
-  getAllAccounts,getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret, verifyOTP, activateAccount, updateOTP
+  getAllAccounts,getStudentAccounts,getIdAccounts, createAccount, 
+  getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, 
+  getAccountByResetToken, updateAccount2FA, remove2FASecret, getProfilesModel,
+  verifyOTP, activateAccount, updateOTP
+}
