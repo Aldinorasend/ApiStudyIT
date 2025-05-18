@@ -110,7 +110,7 @@ const verifyOTP = async (email, otp) => {
 };
 
 const activateAccount = async (email) => {
-  const sql = 'UPDATE accounts SET User_Type = "Free", otp = NULL, otp_expiry = NULL WHERE email = ?';
+  const sql = 'UPDATE accounts SET User_Type = "Free", otp = NULL, otp_expiry = NULL, is_verified = TRUE WHERE email = ?';
   try {
     const [result] = await db.query(sql, [email]);
     return result;

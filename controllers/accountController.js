@@ -24,7 +24,7 @@ const enable2FA = async (req, res) => {
 
     res.json({
       message: '2FA enabled successfully',
-      secret: secret.otpauth_url, // URL ini digunakan untuk scan di aplikasi Authenticator
+      secret: secret.base32,
     });
   } catch (err) {
     res.status(500).json({ error: 'Error enabling 2FA', details: err.message });
@@ -140,7 +140,7 @@ const addAccount = async (req, res) => {
     data.password = hashedPassword;
     data.regist_date = new Date();
 
-    const otp = Math.floor(1000 + Math.random() * 9000).toString(); // genearte 4 digit otp code
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // genearte 6 digit otp code
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins otp code
 
     data.otp = otp;
@@ -194,7 +194,7 @@ const resendOTP = async (req, res) => {
       return res.status(400).json({ error: 'Account already verified' });
     }
 
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 menit
 
     await updateOTP(email, otp, expiry);
@@ -231,6 +231,10 @@ const getAccount = async (req, res) => {
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Invalid email/username or password' });
     }
+    // const isVerified = await account.isVerified;
+    // if (!isVerified) {
+    //   return res.status(401).json({ error: 'Account is not verified'});
+    // }
     res.json(account);
   } catch (err) {
     res.status(500).json({ error: 'Error fetching Account', details: err.message });
