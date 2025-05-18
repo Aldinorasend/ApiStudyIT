@@ -12,8 +12,10 @@ const {
     enable2FA,
     verify2FA,
     loginWith2FA,
+    getProfiles,
     disable2FA,
-    getProfiles
+    verifyAccountOTP,
+    resendOTP
 } = require('../controllers/accountController');
 
 const router = express.Router();
@@ -33,5 +35,8 @@ router.post('/Accounts/enable-2fa', enable2FA);
 router.post('/Accounts/verify-2fa', verify2FA);
 router.post('/Accounts/login-2fa', loginWith2FA);
 router.post('/Accounts/disable-2fa', disable2FA);
+router.post('/Accounts/verify-otp', verifyAccountOTP);
+router.post('/Accounts/resend-otp', resendOTP);
+
 
 module.exports = router;

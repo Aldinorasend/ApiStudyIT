@@ -5,9 +5,13 @@ const speakeasy = require('speakeasy');
 const { V4: uuidv4 } = require('uuid');
 const {
 
+
   getAllAccounts, getStudentAccounts,getIdAccounts,getProfilesModel, 
   createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, 
-  saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret
+  saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret,
+  verifyOTP, activateAccount, updateOTP
+
+
 } = require('../models/accountModel');
 
 const enable2FA = async (req, res) => {
@@ -27,7 +31,7 @@ const enable2FA = async (req, res) => {
 
     res.json({
       message: '2FA enabled successfully',
-      secret: secret.otpauth_url, // URL ini digunakan untuk scan di aplikasi Authenticator
+      secret: secret.base32,
     });
   } catch (err) {
     res.status(500).json({ error: 'Error enabling 2FA', details: err.message });
@@ -148,13 +152,77 @@ const addAccount = async (req, res) => {
     // Hash password sebelum menyimpan
     const hashedPassword = await bcrypt.hash(data.password, 10);  // 10 adalah salt rounds
     data.password = hashedPassword;
-
     data.regist_date = new Date();
 
+    const otp = Math.floor(100000 + Math.random() * 900000).toString(); // genearte 6 digit otp code
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins otp code
+
+    data.otp = otp;
+    data.otp_expiry = otpExpiry;
+
     const result = await createAccount(data);
-    res.json({ message: 'Account Created', id: result.insertId });
+
+    await transporter.sendMail({
+      from: 'haritsazfa@gmail.com',
+      to: data.email,
+      subject: 'StudyIT OTP Verification Code',
+      text: `Your OTP code is : ${otp} and it will expire in ${10} minutes`
+    });
+
+    res.json({ message: 'Account Created. Please Verify OTP code', id: result.insertId });
   } catch (err) {
     res.status(500).json({ error: 'Error creating Account', details: err.message });
+  }
+};
+
+const verifyAccountOTP = async (req, res) => {
+  const { email, otp } = req.body;
+
+  try {
+    const account = await verifyOTP(email, otp);
+    if (!account) {
+      return res.status(400).json({ error: 'Invalid or expired OTP' });
+    }
+
+    await activateAccount(email);
+    res.json({ message: 'Account verified successfully, you can now login.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error verifying OTP', details: err.message });
+  }
+};
+
+const resendOTP = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  try {
+    const account = await getAccountByEmailorUsername(email);
+    if (!account) {
+      return res.status(404).json({ error: 'Account not found' });
+    }
+
+    if (account.is_verified) {
+      return res.status(400).json({ error: 'Account already verified' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiry = new Date(Date.now() + 5 * 60 * 1000); // 5 menit
+
+    await updateOTP(email, otp, expiry);
+
+    await transporter.sendMail({
+      from: 'haritsazfa@gmail.com',
+      to: email,
+      subject: 'Resend OTP - StudyIT',
+      text: `Here is your new OTP: ${otp}. It is valid for 5 minutes.`,
+    });
+
+    res.json({ message: 'New OTP sent successfully' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error resending OTP', details: err.message });
   }
 };
 
@@ -176,6 +244,10 @@ const getAccount = async (req, res) => {
     const isPasswordValid = await bcrypt.compare(password, account.password);
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Invalid email/username or password' });
+    }
+    console.log("kondisi akun:",account.is_verified);
+    if (!account.is_verified || account.is_verified === 0) {
+      return res.status(401).json({ error: 'Account is not verified' });
     }
     res.json(account);
   } catch (err) {
@@ -284,6 +356,10 @@ const resetPassword = async (req, res) => {
 module.exports = {
   getAccounts, addAccount, getStudAccounts,getOneAccounts, getAccount, 
   editAccount, removeAccount, requestResetPassword, resetPassword, 
-  enable2FA, verify2FA, loginWith2FA, disable2FA, getProfiles
+  enable2FA, verify2FA, loginWith2FA, disable2FA, getProfiles,
+  verifyAccountOTP, resendOTP
 
 }
+
+
+ 
