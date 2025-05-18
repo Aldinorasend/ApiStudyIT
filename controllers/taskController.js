@@ -6,6 +6,7 @@ const {
     deleteTask,
     getPhotoPathByID,
     getTaskByUserId,
+    getTaskByEnrollId,
   } = require('../models/taskModel');
 const taskModel = require('../models/taskModel');
 const enrollModel = require('../models/enrollModel');
@@ -16,6 +17,17 @@ const enrollModel = require('../models/enrollModel');
       res.json(tasks);
     } catch (err) {
       res.status(500).json({ error: 'Error fetching tasks', details: err.message });
+    }
+  };
+
+  const taskChecker = async (req, res) => {
+    const EnrollID = req.params.EnrollID;
+    const ModulID = req.params.ModulID;
+    try {
+      const tasks = await getTaskByEnrollId(EnrollID, ModulID); // Menggunakan async/await
+      res.json(tasks);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching tasks by Enroll ID', details: err.message });
     }
   };
 
@@ -223,5 +235,9 @@ const addTask = async (req, res) => {
    
    
 
-  module.exports = { getTasks, addTask, getTask, approveTaskAndUpdateProgress, editTask, removeTask, getTasksByTaskID, getTaskByIdUser };
+  module.exports = { 
+    getTasks, addTask, getTask, approveTaskAndUpdateProgress, 
+    editTask, removeTask, getTasksByTaskID, getTaskByIdUser, 
+    taskChecker
+  };
   

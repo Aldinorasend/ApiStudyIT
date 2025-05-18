@@ -30,6 +30,8 @@ const getStudentsEnrollsForUser = async (UserID) => {
     SELECT 
     e.id,
     a.username AS Students_Username,
+    a.firstname AS Students_FirstName,
+    a.lastname AS Students_LastName,
     e.CourseID,
     c.course_name AS Courses_Name,
     c.level AS Courses_Level,

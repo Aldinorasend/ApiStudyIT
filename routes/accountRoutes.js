@@ -12,14 +12,15 @@ const {
     enable2FA,
     verify2FA,
     loginWith2FA,
-    disable2FA
-
+    disable2FA,
+    getProfiles
 } = require('../controllers/accountController');
 
 const router = express.Router();
 
 router.get('/Accounts', getAccounts);
 router.get('/Accounts/:id', getOneAccounts);
+router.get('/Profiles/:user_id', getProfiles);
 router.get('/StudentAccounts', getStudAccounts);
 
 router.post('/Accounts', addAccount);
