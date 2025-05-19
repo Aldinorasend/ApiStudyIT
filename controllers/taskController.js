@@ -149,10 +149,10 @@ const addTask = async (req, res) => {
     }
 
     // Pastikan UserID diterima
-    const userID = req.body.UserID;
-    if (!userID) {
-      return res.status(400).json({ error: 'UserID is required' });
-    }
+    // const userID = req.body.UserID;
+    // if (!userID) {
+    //   return res.status(400).json({ error: 'UserID is required' });
+    // }
 
     // Simpan relative path untuk file
     const imagePath = `${req.file.filename}`;
@@ -161,7 +161,8 @@ const addTask = async (req, res) => {
     const data = {
       ModulID: req.body.ModulID,
       FileTask: imagePath, // Simpan path file di database
-      UserID: userID,      // Tambahkan UserID ke data
+      // UserID: userID,      // Tambahkan UserID ke data
+      EnrollID: req.body.EnrollID,
     };
 
     try {
