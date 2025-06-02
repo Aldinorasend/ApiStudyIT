@@ -24,7 +24,6 @@ router.get('/Accounts', getAccounts);
 router.get('/Accounts/:id', getOneAccounts);
 router.get('/Profiles/:user_id', getProfiles);
 router.get('/StudentAccounts', getStudAccounts);
-
 router.post('/Accounts', addAccount);
 router.post('/Accounts/search', getAccount);
 router.put('/Accounts/:id', editAccount);

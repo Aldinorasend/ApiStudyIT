@@ -9,7 +9,8 @@ const {
     getAllCoursesActive,
     sortingCoursesByEndDateFree,
     sortingCoursesByEndDateSubs,
-    getRatingByIdModel
+    getRatingByIdModel,
+    postRatingModel
   } = require('../models/courseModel');
   
   // Mendapatkan semua course
@@ -142,7 +143,15 @@ const getRatingById = async (req, res) => {
     res.status(500).json({ error: 'Error fetching course', details: err.message });
   }
 };
-
+const postRating = async (req, res) => {
+  const data = req.body;
+  try {
+    const result = await postRatingModel(data);
+    res.json({ message: 'Rating sucess', id: result.insertId });
+  } catch (err) {
+    res.status(500).json({ error: 'Error creating item', details: err.message });
+  }
+};
   // Mendapatkan course berdasarkan ID
   const getCourse = async (req, res) => {
     const id = req.params.id;
@@ -206,6 +215,6 @@ const removeCourse = async (req, res) => {
   module.exports = { 
     getActiveCoursesForUser, getBySortEndDateFree, getBySortEndDateSubs,getCoursesForAdmin, 
     getFreeCoursesForFreeUser,addCourse, getCourse, editCourse, 
-    removeCourse, getPhotoPathById, getRatingById 
+    removeCourse, getPhotoPathById, getRatingById, postRating 
   };
   

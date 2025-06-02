@@ -15,10 +15,18 @@ const getAllCourses = async () => {
     throw err;
   }
 };
-
+const postRatingModel = async(data)=>{
+  const sql = 'INSERT INTO course_rating SET ?';
+  try {
+    const [result] = await db.query(sql, data);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+}
 const getRatingByIdModel = async (id) => {
   const sql = `
-    SELECT ROUND(AVG(rating) / 2)  AS average_rating
+    SELECT ROUND(AVG(rating))  AS average_rating
     FROM course_rating 
     WHERE course_id = ?;
   `;
@@ -60,11 +68,15 @@ const sortingCoursesByEndDateSubs = async () => {
 };
 const getAllCoursesActive = async () => {
   const sql = `
-    SELECT courses.*, instructors.firstname, instructors.lastname 
-    FROM courses
-    LEFT JOIN instructors ON courses.instructor_id = instructors.id
-    WHERE courses.status = 'active'
-    ORDER BY courses.level ASC
+    SELECT 
+    courses.*, 
+    instructors.firstname, 
+    instructors.lastname,
+    (SELECT COUNT(*) FROM moduls WHERE moduls.CourseID = courses.id) AS jumlah_modul
+FROM courses
+LEFT JOIN instructors ON courses.instructor_id = instructors.id
+WHERE courses.status = 'active'
+ORDER BY courses.level ASC
   `;
   try {
     const [results] = await db.query(sql);
@@ -151,5 +163,5 @@ const getPhotoPathById = async (id) => {
 module.exports = { 
   getAllCourses, getAllCoursesActive, sortingCoursesByEndDateFree,sortingCoursesByEndDateSubs,
   getFreeCourses, createCourse, getCourseById, updateCourse, 
-  deleteCourse, getPhotoPathById, getRatingByIdModel 
+  deleteCourse, getPhotoPathById, getRatingByIdModel, postRatingModel 
 };
