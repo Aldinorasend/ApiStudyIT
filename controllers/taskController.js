@@ -106,8 +106,8 @@ const enrollModel = require('../models/enrollModel');
     if (
       file.mimetype === 'image/jpeg' ||
       file.mimetype === 'image/png' ||
-      file.mimetype === 'image/jpg'
-      // file.mimetype === 'application/pdf'
+      file.mimetype === 'image/jpg' ||
+      file.mimetype === 'application/pdf'
     ) {
       cb(null, true); // Terima file
     } else {

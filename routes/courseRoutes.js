@@ -11,6 +11,7 @@ const {
   getBySortEndDateFree,
   getBySortEndDateSubs,
   getRatingById,
+  postRating
 } = require('../controllers/courseController');
 
 const router = express.Router();
@@ -18,7 +19,7 @@ const router = express.Router();
 router.get('/coursesUser', getActiveCoursesForUser);
 router.get('/coursesSortedFree', getBySortEndDateFree);
 router.get('/coursesSortedSubscriber', getBySortEndDateSubs);
-
+router.post('/postRating', postRating)
 router.get('/coursesAdmin', getCoursesForAdmin);
 router.get('/freecourses', getFreeCoursesForFreeUser);        // GET semua course
 router.post('/courses', addCourse);       // POST course baru

@@ -161,7 +161,7 @@ const addAccount = async (req, res) => {
     data.otp_expiry = otpExpiry;
 
     const result = await createAccount(data);
-
+    console.log(data);
     await transporter.sendMail({
       from: 'haritsazfa@gmail.com',
       to: data.email,

@@ -2,7 +2,11 @@ const db = require('../config/db');
 
 // Mendapatkan semua modul
 const getAllModuls = async () => {
-  const sql = 'SELECT * FROM moduls';
+  const sql = ` 
+  SELECT moduls.*, courses.course_name
+    FROM moduls
+    LEFT JOIN courses ON moduls.CourseID = courses.id
+`;
   try {
     const [results] = await db.query(sql);
     return results;
