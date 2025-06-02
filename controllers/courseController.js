@@ -1,13 +1,20 @@
 const {
     getAllCourses,
     createCourse,
+    getFreeCourses,
     getCourseById,
     updateCourse,
     deleteCourse,
+    getPhotoPathById,
+    getAllCoursesActive,
+    sortingCoursesByEndDateFree,
+    sortingCoursesByEndDateSubs,
+    getRatingByIdModel,
+    postRatingModel
   } = require('../models/courseModel');
   
   // Mendapatkan semua course
-  const getCourses = async (req, res) => {
+  const getCoursesForAdmin = async (req, res) => {
     try {
       const courses = await getAllCourses(); // Menggunakan async/await
       res.json(courses);
@@ -15,7 +22,39 @@ const {
       res.status(500).json({ error: 'Error fetching courses', details: err.message });
     }
   };
-  
+  const getFreeCoursesForFreeUser = async (req, res) => {
+    try {
+      const courses = await getFreeCourses(); // Menggunakan async/await
+      res.json(courses);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching courses', details: err.message });
+    }
+  };
+
+  const getActiveCoursesForUser = async (req, res) => {
+    try {
+      const courses = await getAllCoursesActive(); // Menggunakan async/await
+      res.json(courses);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching courses', details: err.message });
+    }
+  };
+  const getBySortEndDateFree = async (req, res) => {
+    try {
+      const courses = await sortingCoursesByEndDateFree(); // Menggunakan async/await
+      res.json(courses);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching courses', details: err.message });
+    }
+  };
+  const getBySortEndDateSubs = async (req, res) => {
+    try {
+      const courses = await sortingCoursesByEndDateSubs(); // Menggunakan async/await
+      res.json(courses);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching courses', details: err.message });
+    }
+  };
   // Menambahkan course baru
   const multer = require('multer');
 const fs = require('fs');
@@ -94,9 +133,25 @@ const addCourse = async (req, res) => {
 };
 
 
-
-// Fungsi untuk transfer file ke server Laravel
-
+const getRatingById = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const course = await getRatingByIdModel(id);
+    if (!course) return res.status(404).json({ error: 'Course not found' });
+    res.json(course);
+  } catch (err) {
+    res.status(500).json({ error: 'Error fetching course', details: err.message });
+  }
+};
+const postRating = async (req, res) => {
+  const data = req.body;
+  try {
+    const result = await postRatingModel(data);
+    res.json({ message: 'Rating sucess', id: result.insertId });
+  } catch (err) {
+    res.status(500).json({ error: 'Error creating item', details: err.message });
+  }
+};
   // Mendapatkan course berdasarkan ID
   const getCourse = async (req, res) => {
     const id = req.params.id;
@@ -121,16 +176,45 @@ const addCourse = async (req, res) => {
     }
   };
   
-  // Menghapus course
-  const removeCourse = async (req, res) => {
-    const id = req.params.id;
-    try {
-      await deleteCourse(id);
-      res.json({ message: 'Course deleted' });
-    } catch (err) {
-      res.status(500).json({ error: 'Error deleting course', details: err.message });
-    }
-  };
+
   
-  module.exports = { getCourses, addCourse, getCourse, editCourse, removeCourse };
+  const fst = require('fs').promises;
+
+const removeCourse = async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    // Dapatkan path foto dari database
+    const photoPath = await getPhotoPathById(id); // Pastikan fungsi ini sudah ada
+    if (!photoPath) {
+      return res.status(404).json({ error: 'Course not found or no photo associated' });
+    }
+
+    // Hapus file foto dari folder uploads
+    // const filePath = path.resolve(__dirname, '../uploads', photoPath); // Path absolut
+    // try {
+    //   // Pastikan fs.unlink tidak menggunakan callback
+    //   await fst.unlink(filePath);
+    //   console.log(`File deleted: ${filePath}`);
+    // } catch (fileErr) {
+    //   console.warn(`Failed to delete file: ${filePath}. Error: ${fileErr.message}`);
+    // }
+
+    // Hapus course dari database
+    await deleteCourse(id); // Pastikan fungsi ini sudah ada
+
+    res.json({ message: 'Course and associated photo deleted' });
+  } catch (err) {
+    console.error('Error deleting course or file:', err.message);
+    res.status(500).json({ error: 'Error deleting course', details: err.message });
+  }
+};
+
+  
+  
+  module.exports = { 
+    getActiveCoursesForUser, getBySortEndDateFree, getBySortEndDateSubs,getCoursesForAdmin, 
+    getFreeCoursesForFreeUser,addCourse, getCourse, editCourse, 
+    removeCourse, getPhotoPathById, getRatingById, postRating 
+  };
   

@@ -6,6 +6,92 @@ const getAllCourses = async () => {
     SELECT courses.*, instructors.firstname, instructors.lastname 
     FROM courses
     LEFT JOIN instructors ON courses.instructor_id = instructors.id
+    ORDER BY courses.level ASC
+  `;
+  try {
+    const [results] = await db.query(sql);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+};
+const postRatingModel = async(data)=>{
+  const sql = 'INSERT INTO course_rating SET ?';
+  try {
+    const [result] = await db.query(sql, data);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+}
+const getRatingByIdModel = async (id) => {
+  const sql = `
+    SELECT ROUND(AVG(rating))  AS average_rating
+    FROM course_rating 
+    WHERE course_id = ?;
+  `;
+  try {
+    const [results] = await db.query(sql, [id]);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+};
+const sortingCoursesByEndDateFree = async () => {
+  const sql = `
+  SELECT courses.*, instructors.firstname, instructors.lastname 
+  FROM courses
+  LEFT JOIN instructors ON courses.instructor_id = instructors.id
+  WHERE courses.status = 'active' AND  courses.level = 'beginner'
+  ORDER BY courses.end_date ASC;`;
+  try {
+    const [results] = await db.query(sql);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const sortingCoursesByEndDateSubs = async () => {
+  const sql = `
+  SELECT courses.*, instructors.firstname, instructors.lastname 
+  FROM courses
+  LEFT JOIN instructors ON courses.instructor_id = instructors.id
+  WHERE courses.status = 'active'
+  ORDER BY courses.end_date ASC;`;
+  try {
+    const [results] = await db.query(sql);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+};
+const getAllCoursesActive = async () => {
+  const sql = `
+    SELECT 
+    courses.*, 
+    instructors.firstname, 
+    instructors.lastname,
+    (SELECT COUNT(*) FROM moduls WHERE moduls.CourseID = courses.id) AS jumlah_modul
+FROM courses
+LEFT JOIN instructors ON courses.instructor_id = instructors.id
+WHERE courses.status = 'active'
+ORDER BY courses.level ASC
+  `;
+  try {
+    const [results] = await db.query(sql);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const getFreeCourses = async () => {
+  const sql = `
+    SELECT courses.*, instructors.firstname, instructors.lastname 
+    FROM courses
+    LEFT JOIN instructors ON courses.instructor_id = instructors.id
+    WHERE courses.level = 'beginner' AND courses.status = 'active'
   `;
   try {
     const [results] = await db.query(sql);
@@ -33,7 +119,7 @@ const getCourseById = async (id) => {
     SELECT courses.*, instructors.firstname, instructors.lastname 
     FROM courses
     LEFT JOIN instructors ON courses.instructor_id = instructors.id
-    WHERE courses.id = ?
+    WHERE courses.id = ? 
   `;
   try {
     const [results] = await db.query(sql, [id]);
@@ -56,7 +142,7 @@ const updateCourse = async (id, data) => {
 
 // Menghapus course
 const deleteCourse = async (id) => {
-  const sql = 'DELETE FROM courses WHERE id = ?';
+  const sql = 'UPDATE courses SET status = "inactive" WHERE id = ? ';
   try {
     const [result] = await db.query(sql, [id]);
     return result;
@@ -65,4 +151,17 @@ const deleteCourse = async (id) => {
   }
 };
 
-module.exports = { getAllCourses, createCourse, getCourseById, updateCourse, deleteCourse };
+const getPhotoPathById = async (id) => {
+  const sql = 'SELECT image FROM courses WHERE id = ?';
+  try {
+    const [rows] = await db.query(sql, [id]);
+    return rows.length > 0 ? rows[0].image : null;
+  } catch (err) {
+    throw err;
+  }
+};
+module.exports = { 
+  getAllCourses, getAllCoursesActive, sortingCoursesByEndDateFree,sortingCoursesByEndDateSubs,
+  getFreeCourses, createCourse, getCourseById, updateCourse, 
+  deleteCourse, getPhotoPathById, getRatingByIdModel, postRatingModel 
+};

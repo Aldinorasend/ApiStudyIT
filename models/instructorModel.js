@@ -1,11 +1,21 @@
 const db = require('../config/db');
 
 // Mendapatkan semua instructor
-const getAllInstructors = async () => {
-  const sql = 'SELECT * FROM instructors';
+const getAllInstructors = async (limit, offset) => {
+  const sql = 'SELECT * FROM instructors LIMIT ? OFFSET ?';
+  try {
+    const [results] = await db.query(sql, [limit, offset]);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const getTotalInstructors = async () => {
+  const sql = 'SELECT COUNT(*) as total FROM instructors';
   try {
     const [results] = await db.query(sql);
-    return results;
+    return results[0].total;
   } catch (err) {
     throw err;
   }
@@ -46,7 +56,7 @@ const updateInstructor = async (id, data) => {
 
 // Menghapus instructor
 const deleteInstructor = async (id) => {
-  const sql = 'DELETE FROM instructors WHERE id = ?';
+  const sql = 'UPDATE instructors SET status = "inactive" WHERE id = ?';
   try {
     const [result] = await db.query(sql, [id]);
     return result;
@@ -55,4 +65,5 @@ const deleteInstructor = async (id) => {
   }
 };
 
-module.exports = { getAllInstructors, createInstructor, getInstructorById, updateInstructor, deleteInstructor };
+
+module.exports = { getAllInstructors, getTotalInstructors, createInstructor, getInstructorById, updateInstructor, deleteInstructor };
