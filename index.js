@@ -9,7 +9,8 @@ const modulRoutes = require('./routes/modulRoutes');
 const enrollRoutes = require('./routes/enrollRoutes');
 const contactUsRoutes = require('./routes/contactUsRoutes'); // Import task routes
 const taskRoutes = require('./routes/taskRoutes'); // Import task routes
-
+const replyRoutes = require('./routes/replyRoutes'); // Import reply routes
+const discussionRoutes = require('./routes/discussionRoutes'); // Import discussion routes
 
 require('dotenv').config();
 
@@ -37,6 +38,10 @@ app.use('/api', courseRoutes);
 app.use('/api', contactUsRoutes); // Gunakan taskRoutes
 
 app.use('/api', taskRoutes);
+
+app.use('/api', replyRoutes);
+
+app.use('/api', discussionRoutes);
 
 
 // Jalankan server
