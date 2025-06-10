@@ -149,8 +149,7 @@ const updateOTP = async (email, otp, expiry) => {
 };
 
 module.exports = {
-  getAllAccounts,getStudentAccounts,getIdAccounts, createAccount, 
-  getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, 
-  getAccountByResetToken, updateAccount2FA, remove2FASecret, getProfilesModel,
-  verifyOTP, activateAccount, updateOTP
+
+  getAllAccounts,getIdAccounts, createAccount, getAccountByEmailorUsername, updateAccount, deleteAccount, saveResetToken, getAccountByResetToken, updateAccount2FA, remove2FASecret, verifyOTP, activateAccount, updateOTP, getStudentAccounts
 }
+

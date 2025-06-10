@@ -19,6 +19,7 @@ const enable2FA = async (req, res) => {
 
   try {
     const account = await getAccountByEmailorUsername(email, null);
+    console.log(account, email);
     if (!account) {
       return res.status(404).json({ error: 'Account not found' });
     }
@@ -163,7 +164,7 @@ const addAccount = async (req, res) => {
     const result = await createAccount(data);
     console.log(data);
     await transporter.sendMail({
-      from: 'haritsazfa@gmail.com',
+      from: 'study.it.mailer@gmail.com',
       to: data.email,
       subject: 'StudyIT OTP Verification Code',
       text: `Your OTP code is : ${otp} and it will expire in ${10} minutes`
@@ -214,7 +215,7 @@ const resendOTP = async (req, res) => {
     await updateOTP(email, otp, expiry);
 
     await transporter.sendMail({
-      from: 'haritsazfa@gmail.com',
+      from: 'study.it.mailer@gmail.com',
       to: email,
       subject: 'Resend OTP - StudyIT',
       text: `Here is your new OTP: ${otp}. It is valid for 5 minutes.`,
@@ -291,8 +292,8 @@ const getProfiles = async (req, res) => {
 const transporter = nodemailer.createTransport({
   service: 'Gmail',
   auth: {
-    user: 'haritsazfa@gmail.com',
-    pass: 'bpyz ojiv sfew xcjo',
+    user: 'study.it.mailer@gmail.com',
+    pass: 'jusx gugq vtno txny',
   },
 });
 
@@ -318,7 +319,7 @@ const requestResetPassword = async (req, res) => {
     const resetLink = `http://localhost:8000/reset-password?token=${resetToken}`;
 
     await transporter.sendMail({
-      from: 'haritsazfa@gmail.com',
+      from: 'study.it.mailer@gmail.com',
       to: email,
       subject: 'Password Reset Request',
       text: `You requested a password reset. Click the link to reset your password: ${resetLink}`,
@@ -363,4 +364,6 @@ module.exports = {
 }
 
 
- 
+  getAccounts, addAccount, getOneAccounts, getAccount, editAccount, removeAccount, requestResetPassword, resetPassword, enable2FA, verify2FA, loginWith2FA, disable2FA, verifyAccountOTP, resendOTP, getStudAccounts
+}
+
