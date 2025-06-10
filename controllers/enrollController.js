@@ -9,9 +9,24 @@ const {
     UpdatedProgress,
     paymentReqModel,
     searchCourseModel,
+    getStudentEnrollByEnrollIDModel,
+    postCertifModel
   } = require('../models/enrollModel');
   
   // Mendapatkan semua enroll
+  const getEnrollByEnrollID = async (req, res) => {
+    const EnrollID = req.params.EnrollID;
+    console.log('Checking enrollments for user_id:', EnrollID);
+    try {
+      const enrolls = await getStudentEnrollByEnrollIDModel(EnrollID); // Menggunakan async/await
+      if (enrolls.length === 0) {
+        return res.status(404).json({ error: 'Enrollments not found for this Enroll ID' });
+      }      
+      res.json(enrolls);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching enrolls', details: err.message });
+    }
+  };
   const getStudEnrolls = async (req, res) => {
     const UserID = req.params.UserID;
     console.log('Checking enrollments for user_id:', UserID);
@@ -143,10 +158,21 @@ const {
       res.status(500).json({ error: 'Error processing payments', details: err.message });
     }
   }
-  
+
+  const postCertif = async (req, res) => {
+    const data = req.body;
+    try {
+      console.log(data);
+      const result = await postCertifModel(data);
+      console.log(result);
+      res.json({ message: 'Item created', id: result.insertId });
+    } catch (err) {
+      res.status(500).json({ error: 'Error creating item', details: err.message });
+    }
+  };  
   module.exports = { 
     getEnrolls, addEnroll, getEnroll, editEnroll, getStudEnrolls, 
     getStudyEnrolls,removeEnroll, updateProgress, paymentRequest,
-    searchCourse 
+    searchCourse, getEnrollByEnrollID , postCertif
   };
   

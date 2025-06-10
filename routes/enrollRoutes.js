@@ -2,6 +2,7 @@ const express = require('express');
 const {
   getEnrolls,
   getStudEnrolls,
+  getEnrollByEnrollID,
   getStudyEnrolls,
   addEnroll,
   getEnroll,
@@ -10,12 +11,14 @@ const {
   updateProgress,
   paymentRequest,
   searchCourse,
+  postCertif
 } = require('../controllers/enrollController');
 
 const router = express.Router();
 
 router.get('/enrolls', getEnrolls);
 router.get('/studentsEnrolls/:UserID', getStudEnrolls);        // GET semua enroll for Admin
+router.get('/StudentsEnrollment/:EnrollID', getEnrollByEnrollID);        // GET enrollment by EnrollID buat page course
 router.get('/studentEnrolls/:UserID', getStudyEnrolls);    // GET semua enroll for Students
 router.get('/searchCourse/:UserID/:courseName', searchCourse);    // GET semua enroll for Students
 router.post('/payments', paymentRequest); // GET semua enroll for Students
@@ -24,5 +27,5 @@ router.get('/enrolls/:id', getEnroll);    // GET enroll berdasarkan ID
 router.put('/enrolls/:id', editEnroll);   // PUT untuk update enroll
 router.delete('/enrolls/:id', removeEnroll); // DELETE enroll
 router.put('/updateProgress/:UserID', updateProgress); // DELETE enroll
-
+router.post('/postCertif', postCertif);
 module.exports = router;

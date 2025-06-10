@@ -1,5 +1,29 @@
 const db = require('../config/db');
-
+const {} = require('../controllers/enrollController');
+const getStudentEnrollByEnrollIDModel = async (EnrollID) => {
+  const sql = `
+    SELECT 
+    enrollments.id,
+    accounts.firstname AS Students_FirstName, 
+    accounts.lastname AS Students_LastName,
+    courses.course_name AS Courses_Name, 
+    instructors.firstname AS Instructors_FirstName, 
+    instructors.lastname AS Instructors_LastName,
+    enrollments.CourseID,
+    enrollments.Progress
+        FROM enrollments
+        LEFT JOIN accounts ON enrollments.UserID = accounts.id  
+        LEFT JOIN courses ON enrollments.CourseID = courses.id  
+        LEFT JOIN instructors ON courses.instructor_id = instructors.id  
+    WHERE enrollments.id = ? ORDER BY enrollments.CourseID ASC
+  `;
+  try {
+    const [results] = await db.query(sql, [EnrollID]);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+}
 // Mendapatkan semua enrolls
 const getStudentsEnrolls = async (UserID) => {
   const sql = `
@@ -30,6 +54,8 @@ const getStudentsEnrollsForUser = async (UserID) => {
     SELECT 
     e.id,
     a.username AS Students_Username,
+    a.firstname AS Students_FirstName,
+    a.lastname AS Students_LastName,
     e.CourseID,
     c.course_name AS Courses_Name,
     c.level AS Courses_Level,
@@ -66,9 +92,30 @@ ORDER BY
   `;
   try {
     const [results] = await db.query(sql, [UserID]);
-    return results;
+    
+    // Jika tidak ada hasil, return object dengan properti success dan message
+    if (!results || results.length === 0) {
+      return {
+        success: true,
+        message: "No active courses found for this user",
+        data: [],
+        count: results.length
+      };
+    }
+    
+    // Jika ada hasil, return seperti biasa tapi dengan format yang konsisten
+    return {
+      success: true,
+      data: results
+    };
+    
   } catch (err) {
-    throw err;
+    // Return error dalam format yang konsisten
+    return {
+      success: false,
+      message: "Error fetching enrollment data",
+      error: err.message
+    };
   }
 }
 const searchCourseModel = async (UserID, courseName) => {
@@ -160,20 +207,34 @@ const createEnroll = async (data) => {
 // In enrollModel.js
 const UpdatedProgress = async (UserID) => {
   const sql = `
-    UPDATE enrollments e
-    JOIN (
-        SELECT 
-            e.id AS enroll_id,
-            COUNT(CASE WHEN t.Status = 'Completed' THEN 1 END) * 100.0 / 
-            NULLIF(COUNT(t.id), 0) AS new_progress
-        FROM enrollments e
-        LEFT JOIN tasks t ON t.EnrollID = e.id
-        LEFT JOIN moduls m ON t.ModulID = m.id
-        WHERE e.UserID = ?
-        GROUP BY e.id
-    ) AS progress_calc ON e.id = progress_calc.enroll_id
-    SET e.Progress = COALESCE(progress_calc.new_progress, 0)
-    WHERE e.UserID = ?;
+  UPDATE enrollments e
+JOIN (
+    SELECT 
+        e.id AS enroll_id,
+        -- Hitung modul yang memiliki minimal 1 task untuk enrollment ini
+        COUNT(DISTINCT m.id) AS total_modul_with_tasks,
+        -- Hitung modul yang memiliki semua task completed
+        COUNT(DISTINCT CASE 
+            WHEN m.id IN (
+                SELECT t.ModulID 
+                FROM tasks t 
+                WHERE t.EnrollID = e.id
+                GROUP BY t.ModulID
+                HAVING COUNT(*) = SUM(CASE WHEN t.Status = 'Completed' THEN 1 ELSE 0 END)
+            ) THEN m.id
+        END) AS completed_modul_count
+    FROM enrollments e
+    JOIN courses c ON e.CourseID = c.id
+    LEFT JOIN moduls m ON c.id = m.CourseID
+    LEFT JOIN tasks t ON m.id = t.ModulID AND t.EnrollID = e.id
+    WHERE e.UserID = ?
+    GROUP BY e.id
+) AS progress_calc ON e.id = progress_calc.enroll_id
+SET e.Progress = CASE 
+    WHEN progress_calc.total_modul_with_tasks = 0 THEN 0
+    ELSE (progress_calc.completed_modul_count * 100.0) / progress_calc.total_modul_with_tasks
+END
+WHERE e.UserID = ?
   `;
   try {
     const [result] = await db.query(sql, [UserID, UserID]);
@@ -230,8 +291,19 @@ const paymentReqModel = async (data) => {
     throw err;
   }
 }
+
+const postCertifModel = async (data) => {
+  const sql = 'INSERT INTO sertifs SET ?';
+  try {
+    const [result] = await db.query(sql, data);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
 module.exports = { 
   getAllEnrolls, getStudentsEnrolls, getStudentsEnrollsForUser,UpdatedProgress,
   getEnrollmentByCourseAndUser ,createEnroll, getEnrollById, updateEnroll, 
-  deleteEnroll,paymentReqModel, searchCourseModel 
+  deleteEnroll,paymentReqModel, searchCourseModel, getEnrollById,getStudentEnrollByEnrollIDModel,
+  postCertifModel 
 };

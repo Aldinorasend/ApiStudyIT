@@ -6,6 +6,7 @@ const {
     deleteTask,
     getPhotoPathByID,
     getTaskByUserId,
+    getTaskByEnrollId,
   } = require('../models/taskModel');
 const taskModel = require('../models/taskModel');
 const enrollModel = require('../models/enrollModel');
@@ -16,6 +17,17 @@ const enrollModel = require('../models/enrollModel');
       res.json(tasks);
     } catch (err) {
       res.status(500).json({ error: 'Error fetching tasks', details: err.message });
+    }
+  };
+
+  const taskChecker = async (req, res) => {
+    const EnrollID = req.params.EnrollID;
+    const ModulID = req.params.ModulID;
+    try {
+      const tasks = await getTaskByEnrollId(EnrollID, ModulID); // Menggunakan async/await
+      res.json(tasks);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching tasks by Enroll ID', details: err.message });
     }
   };
 
@@ -94,8 +106,8 @@ const enrollModel = require('../models/enrollModel');
     if (
       file.mimetype === 'image/jpeg' ||
       file.mimetype === 'image/png' ||
-      file.mimetype === 'image/jpg'
-      // file.mimetype === 'application/pdf'
+      file.mimetype === 'image/jpg' ||
+      file.mimetype === 'application/pdf'
     ) {
       cb(null, true); // Terima file
     } else {
@@ -137,10 +149,10 @@ const addTask = async (req, res) => {
     }
 
     // Pastikan UserID diterima
-    const userID = req.body.UserID;
-    if (!userID) {
-      return res.status(400).json({ error: 'UserID is required' });
-    }
+    // const userID = req.body.UserID;
+    // if (!userID) {
+    //   return res.status(400).json({ error: 'UserID is required' });
+    // }
 
     // Simpan relative path untuk file
     const imagePath = `${req.file.filename}`;
@@ -149,7 +161,8 @@ const addTask = async (req, res) => {
     const data = {
       ModulID: req.body.ModulID,
       FileTask: imagePath, // Simpan path file di database
-      UserID: userID,      // Tambahkan UserID ke data
+      // UserID: userID,      // Tambahkan UserID ke data
+      EnrollID: req.body.EnrollID,
     };
 
     try {
@@ -223,5 +236,9 @@ const addTask = async (req, res) => {
    
    
 
-  module.exports = { getTasks, addTask, getTask, approveTaskAndUpdateProgress, editTask, removeTask, getTasksByTaskID, getTaskByIdUser };
+  module.exports = { 
+    getTasks, addTask, getTask, approveTaskAndUpdateProgress, 
+    editTask, removeTask, getTasksByTaskID, getTaskByIdUser, 
+    taskChecker
+  };
   
