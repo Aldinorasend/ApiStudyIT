@@ -6,7 +6,7 @@ const pool = mysql.createPool({
   user: 'root',
   password: '',
 
-  database: 'studyitv3',
+  database: 'studyitfinal',
 
   // database: 'studyitfinal',
 
