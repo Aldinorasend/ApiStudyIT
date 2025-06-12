@@ -269,6 +269,17 @@ const updateEnroll = async (id, data) => {
     throw err;
   }
 };
+const updateUserTypeModel = async (UserID) => {
+  const sql1 = `UPDATE subscribers SET Status = 'Completed' WHERE UserID = ?`;
+  const sql2 = `UPDATE accounts SET User_Type ='Subscriber' WHERE accounts.id = ? `;
+  try {
+    await db.query(sql1, [UserID]);
+    const [result] = await db.query(sql2, [UserID]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
 
 // Menghapus enroll
 const deleteEnroll = async (id) => {
@@ -301,9 +312,39 @@ const postCertifModel = async (data) => {
     throw err;
   }
 };
+
+const getAllPaymentsModel = async () => {
+  const sql = `
+    SELECT subscribers.*, accounts.firstname, accounts.lastname, accounts.email 
+    FROM subscribers
+    LEFT JOIN accounts ON subscribers.UserID = accounts.id
+   
+  `;
+  try {
+    const [results] = await db.query(sql);
+    return results;
+  } catch (err) {
+    throw err;
+  }
+};
+
+const getPaymentsByUserIDModel = async (id) => {
+  const sql = `
+    SELECT s.*, a.firstname, a.lastname, a.email 
+    FROM subscribers s
+    LEFT JOIN accounts a ON s.UserID = a.id
+    WHERE s.UserID = ?
+  `;
+  try {
+    const [results] = await db.query(sql, [id]);
+    return results[0];
+  } catch (err) {
+    throw err;
+  }
+};
 module.exports = { 
   getAllEnrolls, getStudentsEnrolls, getStudentsEnrollsForUser,UpdatedProgress,
   getEnrollmentByCourseAndUser ,createEnroll, getEnrollById, updateEnroll, 
   deleteEnroll,paymentReqModel, searchCourseModel, getEnrollById,getStudentEnrollByEnrollIDModel,
-  postCertifModel 
+  postCertifModel, getAllPaymentsModel, getPaymentsByUserIDModel, updateUserTypeModel 
 };

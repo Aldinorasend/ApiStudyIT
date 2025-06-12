@@ -10,8 +10,12 @@ const {
     paymentReqModel,
     searchCourseModel,
     getStudentEnrollByEnrollIDModel,
-    postCertifModel
+    postCertifModel,
+    getAllPaymentsModel,
+    getPaymentsByUserIDModel,
+    updateUserTypeModel
   } = require('../models/enrollModel');
+const { get } = require('../routes/instructorRoutes');
   
   // Mendapatkan semua enroll
   const getEnrollByEnrollID = async (req, res) => {
@@ -170,9 +174,42 @@ const {
       res.status(500).json({ error: 'Error creating item', details: err.message });
     }
   };  
+
+  const getPayments = async (req, res) => {
+    try {
+      const payment = await getAllPaymentsModel(); // Menggunakan async/await
+      res.json(payment);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching payment', details: err.message });
+    }
+  };
+
+  const getPaymentsByUserId = async (req, res) => {
+    const id = req.params.UserID;
+    try {
+      const payment = await getPaymentsByUserIDModel(id);
+      if (!payment) return res.status(404).json({ error: 'payment not found' });
+      res.json(payment);
+    } catch (err) {
+      res.status(500).json({ error: 'Error fetching payment', details: err.message });
+    }
+  };
+
+  const updateUserType = async (req, res) => {
+    const UserID = req.params.UserID;
+    try {
+      await updateUserTypeModel(UserID);
+      res.json({ message: 'Status updated' });
+      console.log('Status updated for user:', UserID);
+    } catch (err) {
+      res.status(500).json({ error: 'Error updating status', details: err.message });
+      console.log('Error updating status for user:', UserID, err.message);
+    }
+  };
   module.exports = { 
     getEnrolls, addEnroll, getEnroll, editEnroll, getStudEnrolls, 
     getStudyEnrolls,removeEnroll, updateProgress, paymentRequest,
-    searchCourse, getEnrollByEnrollID , postCertif
+    searchCourse, getEnrollByEnrollID , postCertif, getPayments, getPaymentsByUserId,
+    updateUserType
   };
   
