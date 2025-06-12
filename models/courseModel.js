@@ -133,6 +133,7 @@ const getCourseById = async (id) => {
 const updateCourse = async (id, data) => {
   const sql = 'UPDATE courses SET ? WHERE id = ?';
   try {
+    console.log(data);
     const [result] = await db.query(sql, [data, id]);
     return result;
   } catch (err) {

@@ -364,6 +364,6 @@ module.exports = {
 }
 
 
-  getAccounts, addAccount, getOneAccounts, getAccount, editAccount, removeAccount, requestResetPassword, resetPassword, enable2FA, verify2FA, loginWith2FA, disable2FA, verifyAccountOTP, resendOTP, getStudAccounts
-}
+  // getAccounts, addAccount, getOneAccounts, getAccount, editAccount, removeAccount, requestResetPassword, resetPassword, enable2FA, verify2FA, loginWith2FA, disable2FA, verifyAccountOTP, resendOTP, getStudAccounts
+
 
