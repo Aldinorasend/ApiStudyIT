@@ -109,15 +109,36 @@ const {
   
   // Mengupdate modul
   const editModul = async (req, res) => {
+    upload(req, res, async (err) => {
+    if (err) {
+      console.error(err);
+      return res.status(400).json({ error: 'File upload error', details: err.message });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file uploaded' });
+    }
+
+    // Simpan relative path untuk file
+    const imagePath = `${req.file.filename}`;
     const id = req.params.id;
-    const data = req.body;
+    const data = {
+      CourseID: req.body.CourseID,
+      Title: req.body.Title,
+      Description: req.body.Description,
+      YTEmbedLink: req.body.YTEmbedLink,
+      Task: req.body.Task,
+      Assetto: imagePath, // Simpan path file di database
+    };
     try {
+      console.log(data);
       await updateModul(id, data);
       res.json({ message: 'Modul updated' });
     } catch (err) {
       res.status(500).json({ error: 'Error updating modul', details: err.message });
     }
-  };
+  });
+}
   
   // Menghapus modul
   const removeModul = async (req, res) => {

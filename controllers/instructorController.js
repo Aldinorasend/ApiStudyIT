@@ -2,7 +2,7 @@ const {
   getAllInstructors,
   getTotalInstructors,
   createInstructor,
-  getInstructorById,
+  getInstructorByIdModel,
   updateInstructor,
   deleteInstructor,
 } = require('../models/instructorModel');
@@ -81,10 +81,10 @@ const addInstructor = async (req, res) => {
 };
 
 // Mendapatkan instructor berdasarkan ID
-const getInstructor = async (req, res) => {
+const getInstructorById = async (req, res) => {
   const id = req.params.id;
   try {
-    const instructor = await getInstructorById(id);
+    const instructor = await getInstructorByIdModel(id);
     if (!instructor) return res.status(404).json({ error: 'Instructor not found' });
     res.json(instructor);
   } catch (err) {
@@ -120,4 +120,4 @@ const removeInstructor = async (req, res) => {
 };
 
 
-module.exports = { getInstructors, getPaginatedInstructors,addInstructor, getInstructor, editInstructor, removeInstructor };
+module.exports = { getInstructors, getPaginatedInstructors,addInstructor, getInstructorById, editInstructor, removeInstructor };

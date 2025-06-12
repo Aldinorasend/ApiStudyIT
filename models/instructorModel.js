@@ -33,7 +33,7 @@ const createInstructor = async (data) => {
 };
 
 // Mendapatkan instructor berdasarkan ID
-const getInstructorById = async (id) => {
+const getInstructorByIdModel = async (id) => {
   const sql = 'SELECT * FROM instructors WHERE id = ?';
   try {
     const [results] = await db.query(sql, [id]);
@@ -66,4 +66,4 @@ const deleteInstructor = async (id) => {
 };
 
 
-module.exports = { getAllInstructors, getTotalInstructors, createInstructor, getInstructorById, updateInstructor, deleteInstructor };
+module.exports = { getAllInstructors, getTotalInstructors, createInstructor, getInstructorByIdModel, updateInstructor, deleteInstructor };

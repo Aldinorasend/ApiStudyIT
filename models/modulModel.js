@@ -38,7 +38,12 @@ const getModulById = async (id) => {
 };
 
 const getModulByIdCourse = async (CourseID) => {
-  const sql = 'SELECT * FROM moduls WHERE CourseID = ?';
+  const sql = 
+  `
+  SELECT moduls.* , courses.course_name 
+  FROM moduls  
+  LEFT JOIN courses  ON moduls.CourseID = courses.id
+  WHERE moduls.CourseID = ?`;
   try {
     const [results] = await db.query(sql, [CourseID]);
     return results;// Mengembalikan hanya satu modul

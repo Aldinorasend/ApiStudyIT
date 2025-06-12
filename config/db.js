@@ -7,10 +7,10 @@ const pool = mysql.createPool({
   password: '',
 
 
-  database: 'studyitfinal',
-
-
   // database: 'studyitfinal',
+
+
+  database: 'studyitfinalv3',
 
   waitForConnections: true,
   connectionLimit: 10,
